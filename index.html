@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Mi rutina: prototipo educativo interactivo con datos ficticios.">
+<meta name="theme-color" content="#eaf0fb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#070b16" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mi rutina">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>Mi rutina</title>
+<style>
+:root{
+  --bg:#eaf0fb; --bgA:#d8f3ee; --bgB:#e4e2ff;
+  --text:#0b1324; --text-2:#3d485c; --text-3:#6a7487;
+  --glass:rgba(255,255,255,.52); --glass-2:rgba(255,255,255,.38); --glass-strong:rgba(255,255,255,.8);
+  --field:rgba(255,255,255,.72);
+  --hairline:rgba(15,23,42,.09);
+  --hl:rgba(255,255,255,.95);
+  --rim1:rgba(255,255,255,.95); --rim2:rgba(255,255,255,.25); --rim3:rgba(255,255,255,.08); --rim4:rgba(255,255,255,.7);
+  --sheen:linear-gradient(165deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,0) 42%);
+  --shadow:0 18px 40px -20px rgba(30,41,90,.35),0 2px 8px rgba(30,41,90,.06);
+  --teal:#0b8f86; --teal-soft:rgba(13,148,136,.13);
+  --indigo:#5352d1; --indigo-soft:rgba(83,82,209,.12);
+  --coral:#e5533e; --coral-soft:rgba(229,83,62,.12);
+  --amber:#b86e00; --amber-soft:rgba(245,158,11,.16);
+  --good:#0a8f5c; --danger:#d61f45;
+  --blob1:#8fe3d6; --blob2:#b4bcff; --blob3:#ffc9ad; --blob4:#bfe6ff;
+  --scrim:rgba(10,14,28,.28); --holdhl:rgba(255,255,255,.6);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#070b16; --bgA:#0b2a2a; --bgB:#1a1a44;
+    --text:#eef2f9; --text-2:#c3cbd9; --text-3:#8e98aa;
+    --glass:rgba(30,38,60,.5); --glass-2:rgba(255,255,255,.06); --glass-strong:rgba(44,54,82,.78);
+    --field:rgba(255,255,255,.07);
+    --hairline:rgba(255,255,255,.1);
+    --hl:rgba(255,255,255,.16);
+    --rim1:rgba(255,255,255,.4); --rim2:rgba(255,255,255,.08); --rim3:rgba(255,255,255,.03); --rim4:rgba(255,255,255,.22);
+    --sheen:linear-gradient(165deg,rgba(255,255,255,.1) 0%,rgba(255,255,255,0) 40%);
+    --shadow:0 20px 44px -18px rgba(0,0,0,.7),0 2px 8px rgba(0,0,0,.25);
+    --teal:#3fd9c6; --teal-soft:rgba(45,212,191,.14);
+    --indigo:#a9b1ff; --indigo-soft:rgba(165,180,252,.14);
+    --coral:#ff8a76; --coral-soft:rgba(251,138,120,.14);
+    --amber:#fbbf24; --amber-soft:rgba(251,191,36,.14);
+    --good:#34d399; --danger:#ff5c7a;
+    --blob1:#0f6b63; --blob2:#3a3bb0; --blob3:#7a3416; --blob4:#0b4a6e;
+    --scrim:rgba(0,0,0,.5); --holdhl:rgba(255,255,255,.12);
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;min-height:100vh;min-height:100dvh;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px;line-height:1.42;overscroll-behavior-y:none;-webkit-font-smoothing:antialiased}
+body.locked{overflow:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0;text-align:inherit}
+button:disabled{cursor:default}
+input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em}
+p{margin:0}
+
+/* Fondo vivo para que el cristal tenga algo que refractar */
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+  background:radial-gradient(120% 70% at 0% 0%,var(--bgA) 0%,transparent 60%),radial-gradient(110% 70% at 100% 100%,var(--bgB) 0%,transparent 62%),var(--bg)}
+.blob{position:absolute;border-radius:50%;filter:blur(56px);opacity:.8;will-change:transform;animation:drift 24s ease-in-out infinite alternate}
+.b1{width:340px;height:340px;background:var(--blob1);top:-90px;left:-100px}
+.b2{width:300px;height:300px;background:var(--blob2);top:210px;right:-130px;animation-duration:28s}
+.b3{width:280px;height:280px;background:var(--blob3);bottom:90px;left:-80px;animation-duration:32s}
+.b4{width:260px;height:260px;background:var(--blob4);bottom:-110px;right:-50px;animation-duration:26s}
+@keyframes drift{to{transform:translate3d(46px,70px,0) scale(1.14)}}
+.topblur{position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);z-index:30;background:var(--glass-2);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%)}
+
+/* Cristal líquido */
+.glass{position:relative;background:var(--glass);-webkit-backdrop-filter:blur(26px) saturate(185%);backdrop-filter:blur(26px) saturate(185%);box-shadow:var(--shadow),inset 0 1px 0 var(--hl)}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--sheen);pointer-events:none}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
+  background:linear-gradient(140deg,var(--rim1),var(--rim2) 34%,var(--rim3) 62%,var(--rim4));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.glass>*{position:relative}
+
+#app{position:relative;z-index:1;max-width:560px;margin:0 auto;
+  padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 118px)}
+.demo-banner{margin:0 0 14px;padding:10px 12px;border-radius:14px;background:var(--indigo-soft);color:var(--text);font-size:13px;line-height:1.35;font-weight:700;overflow-wrap:anywhere}
+.demo-banner small{display:block;margin-top:3px;color:var(--text-2);font-size:12px;font-weight:500}
+.view{animation:fadeup .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:6px 4px 16px}
+.eyebrow{font-size:12.5px;font-weight:650;color:var(--text-3);text-transform:uppercase;letter-spacing:.07em}
+h1{font-size:34px;line-height:1.06;margin-top:3px;letter-spacing:-.03em}
+h2{font-size:22px;line-height:1.15}
+h3{font-size:17px;letter-spacing:-.01em}
+.iconbtn{width:44px;height:44px;flex:0 0 44px;border-radius:50%;display:grid;place-items:center;color:var(--text)}
+.iconbtn svg{width:21px;height:21px}
+.muted{color:var(--text-2)} .faint{color:var(--text-3)} .small{font-size:13.5px} .center{text-align:center}
+.good{color:var(--good)} .warn{color:var(--amber)}
+
+.card{border-radius:28px;padding:18px;margin-bottom:14px}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.link{color:var(--teal);font-weight:650;font-size:15px;display:inline-flex;align-items:center;gap:2px}
+.link svg{width:17px;height:17px}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:650;padding:5px 11px;border-radius:999px;background:var(--teal-soft);color:var(--teal)}
+.pill svg{width:15px;height:15px}
+.pill.amber{background:var(--amber-soft);color:var(--amber)}
+.pill.indigo{background:var(--indigo-soft);color:var(--indigo)}
+.pill.gray{background:var(--glass-2);color:var(--text-2);box-shadow:inset 0 0 0 1px var(--hairline)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 22px;border-radius:999px;font-weight:650;font-size:17px;transition:transform .15s ease,opacity .15s;text-align:center;-webkit-user-select:none;user-select:none}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;transform:none}
+.btn svg{width:20px;height:20px}
+.btn.primary{color:#fff;background:linear-gradient(135deg,#0f9f94,#5b5bd6);box-shadow:0 12px 26px -12px rgba(15,159,148,.85),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn.soft{background:var(--glass-strong);color:var(--text);box-shadow:inset 0 1px 0 var(--hl),inset 0 0 0 1px var(--hairline),0 4px 14px -6px rgba(0,0,0,.12)}
+.btn.danger{color:#fff;background:var(--danger);box-shadow:0 10px 22px -12px var(--danger)}
+.btn.dsoft{color:var(--danger);background:rgba(214,31,69,.1)}
+.btn.block{width:100%}
+.btn.sm{min-height:40px;padding:0 15px;font-size:15px}
+.stack{display:grid;gap:10px}
+
+/* Hoy */
+.hero{background:linear-gradient(135deg,rgba(13,160,148,.2),rgba(91,91,214,.16) 70%),var(--glass)}
+.hero.late{background:linear-gradient(135deg,rgba(245,158,11,.22),rgba(229,83,62,.12) 70%),var(--glass)}
+.hero h2{font-size:26px;margin:12px 0 4px}
+.hero .btn{margin-top:16px}
+.hero-ic{position:absolute;right:16px;top:16px;width:56px;height:56px;border-radius:18px;display:grid;place-items:center;color:var(--teal);background:var(--glass-strong);box-shadow:inset 0 1px 0 var(--hl)}
+.hero-ic svg{width:28px;height:28px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{border-radius:22px;padding:13px 12px 12px;min-width:0}
+.stat .eyebrow{font-size:11px}
+.stat b{display:block;font-size:22px;letter-spacing:-.02em;margin-top:4px;white-space:nowrap}
+.stat b small{font-size:13px;font-weight:600;color:var(--text-3);margin-left:2px}
+.stat span{display:block;font-size:12.5px;color:var(--text-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.day{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 0 9px;border-radius:17px;min-height:76px;transition:background .2s}
+.day .wd{font-size:12px;font-weight:650;color:var(--text-3)}
+.day .dn{font-size:17px;font-weight:700;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;font-variant-numeric:tabular-nums}
+.day.today .dn{background:var(--text);color:var(--bg)}
+.day.doseday .wd{color:var(--teal)}
+.day.sel{background:var(--glass-strong);box-shadow:inset 0 1px 0 var(--hl),0 6px 16px -8px rgba(0,0,0,.25)}
+.dots{display:flex;gap:3px;height:6px}
+.dots i{width:6px;height:6px;border-radius:50%}
+.d-dose{background:var(--teal)} .d-w{background:var(--indigo)} .d-m{background:var(--coral)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:12.5px;color:var(--text-3)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:7px;height:7px;border-radius:50%;display:inline-block}
+
+.faces{display:flex;justify-content:space-between;gap:4px}
+.face{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 2px;border-radius:18px;flex:1;font-size:11.5px;font-weight:600;color:var(--text-3);transition:transform .15s}
+.face svg{width:44px;height:44px}
+.face.on{background:var(--glass-strong);color:var(--text);box-shadow:inset 0 1px 0 var(--hl),0 6px 16px -8px rgba(0,0,0,.25)}
+.face:active{transform:scale(.94)}
+
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--hairline)}
+.row:first-child{border-top:0;padding-top:2px}
+.row .ri{width:38px;height:38px;flex:0 0 38px;border-radius:12px;display:grid;place-items:center}
+.row .ri svg{width:20px;height:20px}
+.ri.t{background:var(--teal-soft);color:var(--teal)} .ri.i{background:var(--indigo-soft);color:var(--indigo)} .ri.c{background:var(--coral-soft);color:var(--coral)} .ri.a{background:var(--amber-soft);color:var(--amber)}
+.row .rb{flex:1;min-width:0}
+.row .rb b{display:block;font-size:15.5px}
+.row .rb span{display:block;font-size:13.5px;color:var(--text-3)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;font-size:15px;font-weight:550;background:var(--glass-2);box-shadow:inset 0 0 0 1px var(--hairline);transition:transform .12s}
+.chip:active{transform:scale(.96)}
+.chip svg{width:16px;height:16px}
+.chip.on{background:var(--teal-soft);color:var(--teal);box-shadow:inset 0 0 0 1.5px var(--teal)}
+.chip:disabled{opacity:.45}
+
+.seg{display:flex;padding:3px;border-radius:999px;background:var(--glass-2);box-shadow:inset 0 0 0 1px var(--hairline)}
+.seg button{flex:1;min-height:38px;border-radius:999px;font-size:14.5px;font-weight:650;color:var(--text-2);text-align:center;transition:background .2s}
+.seg button.on{background:var(--glass-strong);color:var(--text);box-shadow:0 3px 10px -4px rgba(0,0,0,.2),inset 0 1px 0 var(--hl)}
+.scale-l{display:flex;justify-content:space-between;font-size:12px;color:var(--text-3);margin:6px 6px 0}
+
+.lbl{display:block;font-size:13px;font-weight:650;color:var(--text-3);margin:0 0 6px 4px}
+.field{display:block;width:100%;min-width:0;min-height:52px;padding:13px 15px;border-radius:15px;border:0;background:var(--field);box-shadow:inset 0 0 0 1px var(--hairline);font-size:17px;outline:none;-webkit-appearance:none;appearance:none}
+.field:focus{box-shadow:inset 0 0 0 2px var(--teal)}
+input[type=date].field{text-align:left}
+input[type=date]::-webkit-date-and-time-value{text-align:left}
+select.field{background-image:linear-gradient(45deg,transparent 50%,var(--text-3) 50%),linear-gradient(135deg,var(--text-3) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+textarea.field{min-height:86px;resize:vertical;line-height:1.4}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid2>div{min-width:0}
+.mt{margin-top:14px} .mt-s{margin-top:8px} .mb{margin-bottom:12px}
+.addrow{display:flex;gap:8px}
+.addrow .field{flex:1}
+.addrow .btn{flex:0 0 auto;min-height:52px;width:52px;padding:0}
+
+.bignum{font-size:52px;font-weight:800;letter-spacing:-.04em;line-height:1;margin-top:6px;font-variant-numeric:tabular-nums}
+.bignum span{font-size:20px;font-weight:650;color:var(--text-3);margin-left:4px;letter-spacing:0}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.kv>div{padding:11px 12px;border-radius:16px;background:var(--glass-2);box-shadow:inset 0 0 0 1px var(--hairline);min-width:0}
+.kv span{display:block;font-size:12px;color:var(--text-3);font-weight:600}
+.kv b{display:block;font-size:18px;margin-top:2px;white-space:nowrap}
+.progress{height:10px;border-radius:6px;background:var(--hairline);overflow:hidden;margin:16px 0 8px}
+.progress i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#14b8a6,#6366f1)}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.empty{padding:22px 10px;text-align:center;color:var(--text-3);font-size:14.5px}
+.list .li{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--hairline)}
+.list .li:first-child{border-top:0}
+.li .lb{flex:1;min-width:0}
+.li .lb b{display:block;font-size:16px}
+.li .lb span{display:block;font-size:13px;color:var(--text-3)}
+.del{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--text-3)}
+.del svg{width:18px;height:18px}
+.del:active{background:var(--hairline)}
+.mbars{display:flex;gap:5px;height:96px}
+.mbar{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.mbar .col{flex:1;width:100%;display:flex;align-items:flex-end}
+.mbar .col i{display:block;width:100%;border-radius:7px;min-height:5px}
+.mbar span{font-size:10.5px;color:var(--text-3);font-weight:600}
+
+.q{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid var(--hairline)}
+.q:first-child{border-top:0}
+.qc{width:26px;height:26px;flex:0 0 26px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--text-3);display:grid;place-items:center;margin-top:1px;color:#fff}
+.qc svg{width:15px;height:15px}
+.q.done .qc{background:var(--teal);box-shadow:none}
+.q .qt{flex:1;min-width:0;overflow-wrap:anywhere;font-size:16px}
+.q.done .qt{color:var(--text-3);text-decoration:line-through}
+.procard{display:flex;align-items:center;gap:14px;text-align:left;width:100%;background:linear-gradient(135deg,rgba(91,91,214,.18),rgba(13,160,148,.12) 75%),var(--glass)}
+.procard .pi{width:52px;height:52px;flex:0 0 52px;border-radius:16px;display:grid;place-items:center;background:var(--glass-strong);color:var(--indigo);box-shadow:inset 0 1px 0 var(--hl)}
+.procard .pi svg{width:26px;height:26px}
+.procard .chev{color:var(--text-3)} .procard .chev svg{width:20px;height:20px}
+.foot{font-size:12.5px;color:var(--text-3);text-align:center;margin:18px 12px 0;line-height:1.5}
+.offline{display:inline-flex;align-items:center;gap:6px;margin:0 4px 12px;font-size:13px;font-weight:600;color:var(--amber)}
+.offline svg{width:15px;height:15px}
+
+/* Barra de pestañas flotante */
+.tabbar{position:fixed;z-index:40;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(calc(100% - 22px),520px);display:flex;gap:2px;padding:6px;border-radius:999px;background:var(--glass)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 0 6px;border-radius:999px;font-size:10.5px;font-weight:650;color:var(--text-3);text-align:center;transition:color .2s,background .25s}
+.tab svg{width:24px;height:24px}
+.tab[aria-current="page"]{color:var(--teal);background:var(--glass-strong);box-shadow:inset 0 1px 0 var(--hl),0 4px 12px -6px rgba(0,0,0,.25)}
+
+/* Hojas */
+.sheet{position:fixed;inset:0;z-index:60;display:none}
+.sheet.open{display:block}
+.sheet .scrim{position:absolute;inset:0;background:var(--scrim);animation:fade .25s ease}
+.sheet .panel{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:600px;max-height:calc(100% - env(safe-area-inset-top) - 18px);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  border-radius:32px 32px 0 0;background:var(--glass-strong);-webkit-backdrop-filter:blur(34px) saturate(190%);backdrop-filter:blur(34px) saturate(190%);
+  box-shadow:0 -12px 40px -10px rgba(0,0,0,.3),inset 0 1px 0 var(--hl);padding:8px 18px calc(26px + env(safe-area-inset-bottom));animation:up .38s cubic-bezier(.2,.85,.2,1)}
+.sheet.full .panel{top:calc(env(safe-area-inset-top) + 10px);max-height:none}
+.sheet.closing .panel{animation:down .22s ease forwards}
+.sheet.closing .scrim{animation:fade .22s ease reverse forwards}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--hairline);margin:2px auto 10px}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+@keyframes down{to{transform:translateY(100%)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet-head{display:flex;align-items:center;gap:10px;margin:2px 0 14px}
+.sheet-head .st{flex:1;min-width:0;text-align:center}
+.sheet-head .sp{width:44px;flex:0 0 44px}
+.sect{border-radius:22px;padding:16px;margin-bottom:12px;background:var(--glass-2);box-shadow:inset 0 0 0 1px var(--hairline)}
+.sect h3{margin-bottom:10px}
+
+/* Toma simulada */
+.steps{display:flex;gap:6px;justify-content:center;margin:0 0 16px}
+.steps i{width:26px;height:5px;border-radius:3px;background:var(--hairline);transition:background .3s}
+.steps i.on{background:var(--teal)}
+.zone{display:flex;gap:14px;align-items:stretch}
+.zone .fig{flex:0 0 108px;border-radius:22px;background:var(--glass-2);box-shadow:inset 0 0 0 1px var(--hairline);display:grid;place-items:center;padding:8px}
+.zone .fig svg{width:92px;height:auto}
+.sites{flex:1;display:grid;gap:8px}
+.site{display:flex;flex-direction:column;justify-content:center;padding:12px 14px;border-radius:18px;background:var(--glass-2);box-shadow:inset 0 0 0 1px var(--hairline);text-align:left}
+.site b{font-size:16px} .site span{font-size:12.5px;color:var(--text-3)}
+.site em{font-style:normal;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em}
+.site.on{background:var(--teal-soft);box-shadow:inset 0 0 0 2px var(--teal)}
+.fig .z{fill:var(--teal);opacity:0;transition:opacity .25s}
+.fig .z.on{opacity:.9}
+.fig .zp{fill:none;stroke:var(--teal);stroke-width:2;opacity:0}
+.fig .zp.on{opacity:.6;animation:pulse 1.6s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{from{transform:scale(.6);opacity:.8}to{transform:scale(1.8);opacity:0}}
+.ck{display:flex;align-items:center;gap:14px;width:100%;padding:15px;border-radius:18px;background:var(--glass-2);box-shadow:inset 0 0 0 1px var(--hairline);text-align:left;margin-bottom:9px}
+.ck .box{width:28px;height:28px;flex:0 0 28px;border-radius:9px;box-shadow:inset 0 0 0 2px var(--text-3);display:grid;place-items:center;color:#fff;transition:background .2s}
+.ck .box svg{width:17px;height:17px;opacity:0}
+.ck.on .box{background:var(--teal);box-shadow:none}
+.ck.on .box svg{opacity:1}
+.ck b{display:block;font-size:16px;color:var(--text)} .ck small{display:block;font-size:13px;color:var(--text-3)}
+.hold{position:relative;width:min(70vw,262px);aspect-ratio:1/1;margin:8px auto 6px;border-radius:50%;display:grid;place-items:center;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform .2s ease;
+  background:radial-gradient(circle at 35% 28%,var(--holdhl),rgba(255,255,255,0) 55%),var(--glass)}
+.hold.active{transform:scale(.96)}
+.hold .ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);pointer-events:none}
+.hold .inner{text-align:center;pointer-events:none}
+.hold .count{font-size:76px;font-weight:800;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums}
+.hold .hl{font-size:14px;font-weight:650;color:var(--text-3);margin-top:6px}
+#ringFill{transition:stroke-dashoffset .08s linear}
+#ringFill.reset{transition:stroke-dashoffset .5s ease}
+.msg{min-height:44px;text-align:center;font-size:14.5px;color:var(--text-2);margin:6px 8px 4px}
+.msg.warn{color:var(--amber);font-weight:600}
+.okmark{width:116px;height:116px;margin:10px auto 14px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#14b8a6,#6366f1);box-shadow:0 18px 40px -14px rgba(20,184,166,.8),inset 0 2px 0 rgba(255,255,255,.4);animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.okmark svg{width:58px;height:58px;color:#fff}
+.okmark path{stroke-dasharray:30;stroke-dashoffset:30;animation:draw .45s .25s ease forwards}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.note{font-size:12.5px;color:var(--text-3);text-align:center;line-height:1.5;margin-top:12px}
+
+/* Vista profesional */
+.pro-band{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.kpi{padding:13px;border-radius:18px;background:var(--glass-2);box-shadow:inset 0 0 0 1px var(--hairline);min-width:0}
+.kpi span{display:block;font-size:12px;font-weight:650;color:var(--text-3)}
+.kpi b{display:block;font-size:22px;letter-spacing:-.02em;margin-top:3px}
+.kpi small{display:block;font-size:12.5px;color:var(--text-3)}
+.hbar{display:grid;grid-template-columns:118px 1fr 26px;align-items:center;gap:8px;font-size:14px;margin:7px 0}
+.hbar .tr{height:9px;border-radius:5px;background:var(--hairline);overflow:hidden}
+.hbar .fl{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--coral),#f59e0b)}
+.hbar .fl.ok{background:linear-gradient(90deg,#14b8a6,#6366f1)}
+.hbar b{text-align:right;font-variant-numeric:tabular-nums}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{font-size:12px;color:var(--text-3);font-weight:650;text-align:left;padding:6px 4px}
+.tbl td{padding:9px 4px;border-top:1px solid var(--hairline)}
+.pinfo{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:14px}
+.pinfo span{display:block;font-size:12px;color:var(--text-3);font-weight:600}
+.btnrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.btnrow .btn{padding:0 12px;font-size:15px}
+
+/* Bienvenida */
+.welcome{text-align:center;padding:6px 4px 0}
+.appicon{width:92px;height:92px;margin:8px auto 14px;border-radius:24px;overflow:hidden;box-shadow:0 16px 36px -14px rgba(20,120,160,.7)}
+.appicon svg{width:100%;height:100%;display:block}
+.feat{list-style:none;padding:0;margin:18px 0 20px;text-align:left;display:grid;gap:10px}
+.feat li{display:flex;gap:12px;align-items:center;padding:11px 13px;border-radius:18px;background:var(--glass-2);box-shadow:inset 0 0 0 1px var(--hairline)}
+.feat li>svg{width:22px;height:22px;flex:0 0 22px;color:var(--teal)}
+.feat b{display:block;font-size:15.5px} .feat span{display:block;font-size:13px;color:var(--text-3)}
+
+/* Diálogo y aviso */
+.dialog{position:fixed;inset:0;z-index:90;display:none;place-items:center;padding:24px;background:var(--scrim)}
+.dialog.open{display:grid;animation:fade .2s ease}
+.dialog .box{width:min(100%,340px);border-radius:28px;padding:22px 20px 18px;text-align:center;background:var(--glass-strong);animation:pop .3s cubic-bezier(.2,1.3,.4,1)}
+.dialog .box p{margin:8px 0 18px;color:var(--text-2);font-size:15px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 100px);transform:translate(-50%,16px);opacity:0;z-index:95;padding:12px 18px;border-radius:999px;font-weight:650;font-size:15px;transition:opacity .25s,transform .25s;pointer-events:none;max-width:calc(100% - 32px);text-align:center;background:var(--glass-strong)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (min-width:700px){ #app{padding-top:34px} }
+@media (max-width:380px){
+  #app{padding-left:12px;padding-right:12px}
+  .card{padding:15px}
+  .zone{gap:8px}.zone .fig{flex-basis:76px}.zone .fig svg{width:60px}
+  .site{padding:10px}.hbar{grid-template-columns:minmax(80px,105px) minmax(0,1fr) 26px}
+  .stat{padding:11px 8px}.stat b{font-size:19px}.tab{font-size:10px}.btnrow{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important} }
+@media print{
+  .bg,.tabbar,#app,.topblur,.toast,.no-print,.scrim,.grab{display:none!important}
+  body{background:#fff;color:#000}
+  .sheet,.sheet .panel{position:static!important;display:block!important;max-height:none!important;overflow:visible!important;box-shadow:none!important;background:#fff!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;animation:none!important;border-radius:0}
+  .sect,.kpi{break-inside:avoid;background:#fff!important}
+}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span></div>
+<div class="topblur" aria-hidden="true"></div>
+
+<main id="app"></main>
+
+<nav class="tabbar glass" aria-label="Secciones">
+  <button class="tab" data-act="tab" data-tab="hoy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11.2 12 4l8.5 7.2"/><path d="M5.5 9.8V19a1 1 0 0 0 1 1H10v-5.5h4V20h3.5a1 1 0 0 0 1-1V9.8"/></svg>Hoy</button>
+  <button class="tab" data-act="tab" data-tab="semana"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Semana</button>
+  <button class="tab" data-act="tab" data-tab="peso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="m7.5 14.5 3.5-4 3 2.5 5-6"/></svg>Peso</button>
+  <button class="tab" data-act="tab" data-tab="estado"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.6 14.2c.9 1.3 2.1 2 3.4 2s2.5-.7 3.4-2"/><path d="M9.2 9.8h.01M14.8 9.8h.01" stroke-width="2.6"/></svg>Cómo estoy</button>
+  <button class="tab" data-act="tab" data-tab="consulta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 19.8l1.2-4A8 8 0 1 1 20 11.5z"/><path d="M10 9.4a2 2 0 1 1 2.9 1.8c-.6.3-.9.8-.9 1.4v.3M12 15.6h.01" stroke-width="2.1"/></svg>Consulta</button>
+</nav>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <div class="scrim" data-act="scrim"></div>
+  <div class="panel"><div class="grab" aria-hidden="true"></div><div class="content"></div></div>
+</div>
+<div class="dialog" id="dialog" role="alertdialog" aria-modal="true"></div>
+<div class="toast glass" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const VERSION = '1.1.0';
+const DEMO_NOTICE = `<div class="demo-banner" role="note">Prototipo educativo · Solo datos ficticios · No usar con pacientes<small>Los datos de ejemplo se borran al recargar o cerrar la página.</small></div>`;
+
+/* ---------- utilidades ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const pad = n => String(n).padStart(2, '0');
+const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseKey = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+const todayKey = () => keyOf(new Date());
+const addDays = (d, n) => { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; };
+const isoDow = d => (d.getDay() + 6) % 7 + 1;
+const mondayOf = d => addDays(d, -(isoDow(d) - 1));
+const daysBetween = (a, b) => Math.round((parseKey(keyOf(b)) - parseKey(keyOf(a))) / 86400000);
+const fmt = (d, o) => new Intl.DateTimeFormat('es-ES', o).format(d);
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const fLong = d => cap(fmt(d, {weekday: 'long', day: 'numeric', month: 'long'}));
+const fShort = d => fmt(d, {day: 'numeric', month: 'short'}).replace('.', '');
+const fWd = d => fmt(d, {weekday: 'long'});
+const fTime = ts => fmt(new Date(ts), {hour: '2-digit', minute: '2-digit'});
+const num = (n, dec = 1) => Number(n).toLocaleString('es-ES', {minimumFractionDigits: dec, maximumFractionDigits: dec});
+const sign = (n, dec = 1) => (n > 0.0001 ? '+' : n < -0.0001 ? '−' : '') + num(Math.abs(n), dec);
+const WD1 = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+const WDN = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+const vib = p => { try { navigator.vibrate && navigator.vibrate(p); } catch (_) {} };
+
+/* ---------- iconos ---------- */
+const ic = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const I = {
+  drop: ic('<path d="M12 3.5s6.2 6.5 6.2 10.7a6.2 6.2 0 0 1-12.4 0C5.8 10 12 3.5 12 3.5z"/><path d="M9.3 14.6a2.8 2.8 0 0 0 2.4 2.4"/>'),
+  check: ic('<path d="m5 12.5 4.5 4.5L19 7.5"/>'),
+  plus: ic('<path d="M12 5v14M5 12h14"/>'),
+  x: ic('<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>'),
+  chevL: ic('<path d="m14.5 5.5-6.5 6.5 6.5 6.5"/>'),
+  chevR: ic('<path d="m9.5 5.5 6.5 6.5-6.5 6.5"/>'),
+  sliders: ic('<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>'),
+  trash: ic('<path d="M4.5 7h15M10 11v6M14 11v6M6.5 7l.9 11.2A2 2 0 0 0 9.4 20h5.2a2 2 0 0 0 2-1.8L17.5 7M9.5 7V4.5h5V7"/>'),
+  share: ic('<path d="M12 14V3.5M8 7.5l4-4 4 4"/><path d="M6 11H5.5A1.5 1.5 0 0 0 4 12.5v6A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5v-6a1.5 1.5 0 0 0-1.5-1.5H18"/>'),
+  print: ic('<path d="M7 9V4h10v5"/><rect x="3.5" y="9" width="17" height="8" rx="2"/><path d="M7 14h10v6H7z"/>'),
+  scale: ic('<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M8.5 9.5a5 5 0 0 1 7 0"/><path d="m12 9.8 1.2-2"/>'),
+  smile: ic('<circle cx="12" cy="12" r="8.5"/><path d="M8.6 14.2c.9 1.3 2.1 2 3.4 2s2.5-.7 3.4-2"/><path d="M9.2 9.8h.01M14.8 9.8h.01" stroke-width="2.6"/>'),
+  steth: ic('<path d="M6 3.5H5v5a4.5 4.5 0 0 0 9 0v-5h-1"/><path d="M9.5 13v1.5a5 5 0 0 0 10 0V12"/><circle cx="19.5" cy="10" r="2"/>'),
+  cal: ic('<rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
+  chat: ic('<path d="M20 11.5a8 8 0 0 1-11.6 7.1L4 19.8l1.2-4A8 8 0 1 1 20 11.5z"/>'),
+  leaf: ic('<path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19 13 11"/>'),
+  download: ic('<path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14"/>'),
+  reset: ic('<path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v3.7h3.7"/>'),
+  sparkle: ic('<path d="M12 3.5l1.8 5 5 1.8-5 1.8-1.8 5-1.8-5-5-1.8 5-1.8z"/><path d="M19 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>'),
+  offline: ic('<path d="M3 3l18 18"/><path d="M8.5 8.6A9.5 9.5 0 0 0 4 11M20 11a9.5 9.5 0 0 0-6.6-2.9M7.5 14.5a5.5 5.5 0 0 1 4-1.5M12 19h.01"/>'),
+  cloud: ic('<path d="M7 18.5h10a4 4 0 0 0 .5-8A6 6 0 0 0 6 9.5a4.5 4.5 0 0 0 1 9z"/><path d="m9.5 13.8 2 2 3.5-3.6"/>'),
+  info: ic('<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/>'),
+  hand: ic('<path d="M8 13V6.5a1.5 1.5 0 0 1 3 0V12M11 11.5V5a1.5 1.5 0 0 1 3 0v6.5M14 11.5V7a1.5 1.5 0 0 1 3 0v7a6 6 0 0 1-6 6h-.5a6 6 0 0 1-4.6-2.2L4 14.6a1.5 1.5 0 0 1 2.3-1.9L8 14.5"/>')
+};
+const LOGO = `<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#6366f1"/></linearGradient></defs><rect width="100" height="100" fill="url(#lg)"/><ellipse cx="30" cy="22" rx="40" ry="26" fill="#fff" opacity=".18"/><circle cx="50" cy="50" r="24" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="7"/><path d="M50 26a24 24 0 1 1-23.6 19.7" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/><path d="m40 50 7 7 13-14" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+/* ---------- catálogos ---------- */
+const SITES = {
+  abdomen: {t: 'Opción A', d: 'Elemento ficticio'},
+  muslo: {t: 'Opción B', d: 'Elemento ficticio'},
+  brazo: {t: 'Opción C', d: 'Elemento ficticio'}
+};
+const SITE_ORDER = ['abdomen', 'muslo', 'brazo'];
+const siteName = id => (SITES[id] || {}).t || '—';
+const HABITS = [
+  {id: 'paseo', t: 'Paseo'},
+  {id: 'agua', t: 'Agua'},
+  {id: 'proteina', t: 'Comida'},
+  {id: 'sueno', t: 'Descanso'}
+];
+const SYMPTOMS = ['Náuseas', 'Vómitos', 'Estreñimiento', 'Diarrea', 'Ardor o reflujo', 'Dolor abdominal', 'Cansancio', 'Mareo', 'Dolor de cabeza'];
+const MOODS = [null,
+  {t: 'Muy mal', c: '#f0435f'}, {t: 'Mal', c: '#f7883b'}, {t: 'Regular', c: '#e4b10c'},
+  {t: 'Bien', c: '#22b866'}, {t: 'Muy bien', c: '#0ea58a'}];
+const ENERGY = ['', 'Muy baja', 'Baja', 'Normal', 'Buena', 'Muy buena'];
+const HUNGER = ['', 'Nada', 'Poca', 'Normal', 'Bastante', 'Mucha'];
+const SUGGEST = [
+  '¿Qué información se muestra en este ejemplo?',
+  '¿Cómo cambia la gráfica con un nuevo registro?',
+  '¿Qué preguntas incluiría en una consulta ficticia?',
+  '¿Cómo se presenta el resumen de ejemplo?',
+  '¿Qué datos me gustaría revisar?'
+];
+
+/* ---------- datos temporales: solo viven mientras la página está abierta ---------- */
+function fresh() {
+  return {v: 1, onboarded: false, created: Date.now(),
+    profile: {height: null, goal: null, doseDay: isoDow(new Date()), start: todayKey(), nextVisit: null},
+    doses: [], weights: [], moods: [], questions: [], habits: {}};
+}
+function save() {}
+let S = fresh();
+const U = {tab: 'hoy', weekOffset: 0, selDay: todayKey(), range: '3m', proRange: 4, draft: null};
+
+/* ---------- consultas sobre los datos ---------- */
+const byDate = (a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : (a.ts || 0) - (b.ts || 0);
+const sortedWeights = () => [...S.weights].sort(byDate);
+const latestWeight = () => { const w = sortedWeights(); return w[w.length - 1] || null; };
+const firstWeight = () => sortedWeights()[0] || null;
+const weightOn = k => S.weights.find(w => w.date === k) || null;
+const moodOn = k => S.moods.find(m => m.date === k) || null;
+const dosesOn = k => S.doses.filter(d => d.date === k).sort((a, b) => a.ts - b.ts);
+const dosesInWeek = mon => { const a = keyOf(mon), b = keyOf(addDays(mon, 6)); return S.doses.filter(d => d.date >= a && d.date <= b).sort((x, y) => x.ts - y.ts); };
+const doseDateOfWeek = mon => addDays(mon, S.profile.doseDay - 1);
+const bmi = kg => S.profile.height ? kg / Math.pow(S.profile.height / 100, 2) : null;
+const lastDose = () => [...S.doses].sort((a, b) => b.ts - a.ts)[0] || null;
+
+function adherence(fromDate) {
+  const startK = S.profile.start;
+  const startMon = mondayOf(parseKey(startK));
+  const fromMon = fromDate ? mondayOf(fromDate) : startMon;
+  const first = fromMon > startMon ? fromMon : startMon;
+  const curMon = mondayOf(new Date());
+  const tk = todayKey();
+  let due = 0, taken = 0; const missed = [];
+  for (let m = first; m <= curMon; m = addDays(m, 7)) {
+    const has = dosesInWeek(m).length > 0;
+    const ddk = keyOf(doseDateOfWeek(m));
+    if (!has && ddk >= tk) continue;              // aún no tocaba
+    if (!has && ddk < startK) continue;           // antes de empezar
+    due++;
+    if (has) taken++; else missed.push(doseDateOfWeek(m));
+  }
+  return {due, taken, missed, pct: due ? Math.round(taken / due * 100) : null};
+}
+function streak() {
+  let m = mondayOf(new Date()); let n = 0;
+  const startMon = mondayOf(parseKey(S.profile.start));
+  if (dosesInWeek(m).length) n++;
+  else if (keyOf(doseDateOfWeek(m)) < todayKey()) return 0;
+  m = addDays(m, -7);
+  while (m >= startMon && dosesInWeek(m).length) { n++; m = addDays(m, -7); }
+  return n;
+}
+function doseStatus() {
+  const now = new Date(), mon = mondayOf(now), tk = todayKey();
+  const wk = dosesInWeek(mon), dd = doseDateOfWeek(mon), ddk = keyOf(dd);
+  if (wk.length) return {state: 'done', last: wk[wk.length - 1], next: doseDateOfWeek(addDays(mon, 7))};
+  if (ddk === tk) return {state: 'today', date: dd};
+  if (ddk > tk) return {state: 'upcoming', date: dd, inDays: daysBetween(now, dd)};
+  return {state: 'late', date: dd, since: daysBetween(dd, now), next: doseDateOfWeek(addDays(mon, 7))};
+}
+const suggestSite = () => { const l = lastDose(); return l ? SITE_ORDER[(SITE_ORDER.indexOf(l.site) + 1) % 3] : 'abdomen'; };
+
+/* ---------- piezas visuales ---------- */
+function face(level, size = 44) {
+  const c = MOODS[level].c;
+  const curve = [0, -4.2, -2.2, 0, 2.6, 4.6][level];
+  const my = level <= 2 ? 16.4 : 15.2;
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="${c}" opacity=".16"/><circle cx="12" cy="12" r="9.6" fill="none" stroke="${c}" stroke-width="1.6"/><circle cx="8.9" cy="10" r="1.25" fill="${c}"/><circle cx="15.1" cy="10" r="1.25" fill="${c}"/><path d="M8.4 ${my} Q12 ${my + curve} 15.6 ${my}" fill="none" stroke="${c}" stroke-width="1.7" stroke-linecap="round"/></svg>`;
+}
+let gid = 0;
+function weightChart(points, {goal = null, h = 200} = {}) {
+  if (points.length < 2) return `<div class="empty">Registra al menos dos pesos para ver la evolución.</div>`;
+  const w = 340, pl = 34, pr = 14, pt = 16, pb = 26, id = 'wg' + (++gid);
+  const xs = points.map(p => parseKey(p.date).getTime()), ys = points.map(p => p.kg);
+  const showGoal = goal && goal >= Math.min(...ys) - 15;
+  let lo = Math.min(...ys, showGoal ? goal : Infinity), hi = Math.max(...ys, showGoal ? goal : -Infinity);
+  lo = Math.floor(lo - 0.8); hi = Math.ceil(hi + 0.8);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), sx = (x1 - x0) || 1, sy = (hi - lo) || 1;
+  const X = t => pl + (t - x0) / sx * (w - pl - pr), Y = v => pt + (hi - v) / sy * (h - pt - pb);
+  const P = points.map((p, i) => [X(xs[i]), Y(ys[i])]);
+  let d = `M${P[0][0].toFixed(1)} ${P[0][1].toFixed(1)}`;
+  for (let i = 1; i < P.length; i++) {
+    const [ax, ay] = P[i - 1], [bx, by] = P[i], mx = (ax + bx) / 2;
+    d += ` C${mx.toFixed(1)} ${ay.toFixed(1)} ${mx.toFixed(1)} ${by.toFixed(1)} ${bx.toFixed(1)} ${by.toFixed(1)}`;
+  }
+  const area = `${d} L${P[P.length - 1][0].toFixed(1)} ${h - pb} L${P[0][0].toFixed(1)} ${h - pb} Z`;
+  const ticks = []; const step = Math.max(1, Math.round(sy / 4));
+  for (let v = Math.ceil(lo); v <= hi; v += step) ticks.push(v);
+  const grid = ticks.map(v => `<line x1="${pl}" x2="${w - pr}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--hairline)"/><text x="${pl - 7}" y="${(Y(v) + 3.5).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--text-3)">${v}</text>`).join('');
+  const goalLine = showGoal ? `<line x1="${pl}" x2="${w - pr}" y1="${Y(goal).toFixed(1)}" y2="${Y(goal).toFixed(1)}" stroke="var(--good)" stroke-width="1.4" stroke-dasharray="4 4"/><text x="${w - pr}" y="${(Y(goal) - 5).toFixed(1)}" text-anchor="end" font-size="10" font-weight="600" fill="var(--good)">Objetivo ${num(goal)}</text>` : '';
+  const dots = P.length <= 24 ? P.map(p => `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="var(--bg)" stroke="url(#${id}l)" stroke-width="1.8"/>`).join('') : '';
+  const L = P[P.length - 1], lv = ys[ys.length - 1];
+  const lbl = `${num(lv)} kg`, lw = lbl.length * 6.4 + 14;
+  const bx = Math.min(Math.max(L[0] - lw / 2, pl), w - pr - lw), by = Math.max(L[1] - 32, 0);
+  const mid = Math.floor(points.length / 2);
+  const xl = [[0, 'start'], [mid, 'middle'], [points.length - 1, 'end']].filter((v, i, a) => i === 0 || v[0] !== a[i - 1][0])
+    .map(([i, a]) => `<text x="${P[i][0].toFixed(1)}" y="${h - 7}" text-anchor="${a}" font-size="10" fill="var(--text-3)">${fShort(parseKey(points[i].date))}</text>`).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Evolución del peso, último valor ${lbl}">
+    <defs><linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14b8a6" stop-opacity=".35"/><stop offset="1" stop-color="#6366f1" stop-opacity="0"/></linearGradient>
+    <linearGradient id="${id}l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#6366f1"/></linearGradient></defs>
+    ${grid}${goalLine}<path d="${area}" fill="url(#${id}a)"/><path d="${d}" fill="none" stroke="url(#${id}l)" stroke-width="3" stroke-linecap="round"/>${dots}
+    <circle cx="${L[0].toFixed(1)}" cy="${L[1].toFixed(1)}" r="5.5" fill="#6366f1" stroke="#fff" stroke-width="2.5"/>
+    <rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${lw.toFixed(1)}" height="22" rx="11" fill="var(--text)"/><text x="${(bx + lw / 2).toFixed(1)}" y="${(by + 15).toFixed(1)}" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--bg)">${lbl}</text>
+    ${xl}</svg>`;
+}
+function moodBars(days = 14) {
+  const t = new Date(); let html = '<div class="mbars">';
+  for (let i = days - 1; i >= 0; i--) {
+    const d = addDays(t, -i), m = moodOn(keyOf(d)), has = m && m.mood;
+    html += `<div class="mbar" title="${esc(fLong(d))}${has ? ': ' + MOODS[m.mood].t : ''}"><div class="col"><i style="height:${has ? m.mood * 20 : 5}%;background:${has ? MOODS[m.mood].c : 'var(--hairline)'}"></i></div><span>${WD1[isoDow(d) - 1]}</span></div>`;
+  }
+  return html + '</div>';
+}
+function weekGrid(mon, sel, act) {
+  const tk = todayKey();
+  return `<div class="week">${[0, 1, 2, 3, 4, 5, 6].map(i => {
+    const d = addDays(mon, i), k = keyOf(d);
+    const dose = dosesOn(k).length > 0, w = !!weightOn(k), m = !!moodOn(k);
+    return `<button class="day${k === tk ? ' today' : ''}${k === sel ? ' sel' : ''}${i === S.profile.doseDay - 1 ? ' doseday' : ''}" data-act="${act}" data-k="${k}" aria-label="${esc(fLong(d))}${dose ? ', toma registrada' : ''}"><span class="wd">${WD1[i]}</span><span class="dn">${d.getDate()}</span><span class="dots">${dose ? '<i class="d-dose"></i>' : ''}${w ? '<i class="d-w"></i>' : ''}${m ? '<i class="d-m"></i>' : ''}</span></button>`;
+  }).join('')}</div>`;
+}
+const legend = () => `<div class="legend"><span><i style="background:var(--teal)"></i>Toma</span><span><i style="background:var(--indigo)"></i>Peso</span><span><i style="background:var(--coral)"></i>Cómo estoy</span><span style="color:var(--teal);font-weight:650">${WD1[S.profile.doseDay - 1]} = día de toma</span></div>`;
+const head = (eyebrow, title, right = '') => `<header class="head"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div>${right}</header>`;
+
+/* ---------- vistas ---------- */
+function renderHoy() {
+  const now = new Date(), st = doseStatus(), lw = latestWeight(), fw = firstWeight();
+  const ad = adherence(), sk = streak(), md = moodOn(todayKey());
+  const hello = 'Hoy';
+  let hero;
+  if (st.state === 'done') {
+    hero = `<section class="card glass hero"><div class="hero-ic">${I.check}</div><span class="pill">${I.check} Simulación semanal completada</span>
+      <h2>¡Bien hecho!</h2><p class="muted">${fLong(parseKey(st.last.date))} · ${fTime(st.last.ts)} · ${siteName(st.last.site)}</p>
+      <p class="muted small mt-s">Próxima simulación: <b>${fLong(st.next)}</b></p>
+      <button class="btn soft block" data-act="toma">${I.drop} Practicar la toma</button></section>`;
+  } else if (st.state === 'today') {
+    hero = `<section class="card glass hero"><div class="hero-ic">${I.drop}</div><span class="pill">${I.drop} Ejemplo para hoy</span>
+      <h2>Simulación de la semana</h2><p class="muted">Un ejemplo interactivo con una cuenta atrás de 10 segundos.</p>
+      <button class="btn primary block" data-act="toma">${I.drop} Iniciar toma simulada</button></section>`;
+  } else if (st.state === 'upcoming') {
+    hero = `<section class="card glass hero"><div class="hero-ic">${I.cal}</div><span class="pill indigo">${I.cal} Próxima simulación</span>
+      <h2>${fLong(st.date)}</h2><p class="muted">${st.inDays === 1 ? 'Mañana' : `Dentro de ${st.inDays} días`}. Mientras, puedes practicarla.</p>
+      <button class="btn soft block" data-act="toma">${I.drop} Practicar la toma</button></section>`;
+  } else {
+    hero = `<section class="card glass hero late"><div class="hero-ic" style="color:var(--amber)">${I.info}</div><span class="pill amber">${I.info} Simulación pendiente</span>
+      <h2>No hay simulación registrada esta semana</h2><p class="muted">En el ejemplo estaba prevista el ${fWd(st.date)} ${st.date.getDate()}.</p>
+      <button class="btn primary block" data-act="toma">${I.drop} Registrar toma simulada</button></section>`;
+  }
+  const dW = lw && fw ? lw.kg - fw.kg : null;
+  const stats = `<div class="stats">
+    <button class="stat glass" data-act="tab" data-tab="peso"><div class="eyebrow">Peso</div><b>${lw ? num(lw.kg) : '—'}<small>${lw ? 'kg' : ''}</small></b><span class="${dW !== null && dW < 0 ? 'good' : ''}">${dW !== null && S.weights.length > 1 ? sign(dW) + ' kg total' : 'Sin registros'}</span></button>
+    <button class="stat glass" data-act="tab" data-tab="semana"><div class="eyebrow">Adherencia</div><b>${ad.pct !== null ? ad.pct : '—'}<small>${ad.pct !== null ? '%' : ''}</small></b><span>${ad.due ? `${ad.taken} de ${ad.due} semanas` : 'Aún sin semanas'}</span></button>
+    <button class="stat glass" data-act="tab" data-tab="semana"><div class="eyebrow">Racha</div><b>${sk}<small>sem.</small></b><span>${sk ? 'seguidas al día' : 'Empieza hoy'}</span></button>
+  </div>`;
+  const mon = mondayOf(now);
+  const week = `<section class="card glass"><div class="card-h"><h3>Esta semana</h3><button class="link" data-act="tab" data-tab="semana">Ver semana ${I.chevR}</button></div>${weekGrid(mon, null, 'gosemana')}${legend()}</section>`;
+  const mood = `<section class="card glass"><div class="card-h"><h3>¿Cómo te encuentras hoy?</h3>${md ? `<span class="pill">${I.check} Anotado</span>` : ''}</div>
+    <div class="faces">${[1, 2, 3, 4, 5].map(v => `<button class="face${md && md.mood === v ? ' on' : ''}" data-act="qmood" data-v="${v}" aria-label="${MOODS[v].t}">${face(v)}${MOODS[v].t}</button>`).join('')}</div>
+    <button class="link mt" data-act="tab" data-tab="estado">Añadir síntomas o una nota ${I.chevR}</button></section>`;
+  const pend = S.questions.filter(q => !q.done).length;
+  const nv = S.profile.nextVisit ? parseKey(S.profile.nextVisit) : null;
+  const consult = `<section class="card glass"><div class="card-h"><h3>Tu próxima consulta</h3><button class="link" data-act="tab" data-tab="consulta">Preparar ${I.chevR}</button></div>
+    <div class="row"><div class="ri i">${I.cal}</div><div class="rb"><b>${nv ? fLong(nv) : 'Sin fecha'}</b><span>${nv ? visitWhen(nv) : 'Añádela en Consulta'}</span></div></div>
+    <div class="row"><div class="ri c">${I.chat}</div><div class="rb"><b>${pend} ${pend === 1 ? 'pregunta pendiente' : 'preguntas pendientes'}</b><span>Para no olvidar nada en la cita</span></div></div></section>`;
+  const off = navigator.onLine === false ? `<div class="offline">${I.offline} Sin conexión · todo sigue funcionando</div>` : '';
+  return `<div class="view">${head(cap(fmt(now, {weekday: 'long', day: 'numeric', month: 'long'})), hello, `<button class="iconbtn glass" data-act="settings" aria-label="Ajustes">${I.sliders}</button>`)}
+    ${off}${hero}${stats}${week}${mood}${consult}
+    <p class="foot">Solo datos ficticios. Los cambios se borran al recargar o cerrar la página.</p></div>`;
+}
+function visitWhen(d) {
+  const n = daysBetween(new Date(), d);
+  return n === 0 ? 'Hoy' : n === 1 ? 'Mañana' : n > 1 ? `Dentro de ${n} días` : 'Fecha pasada · actualízala';
+}
+
+function renderSemana() {
+  const mon = addDays(mondayOf(new Date()), U.weekOffset * 7), sun = addDays(mon, 6);
+  const inWeek = k => k >= keyOf(mon) && k <= keyOf(sun);
+  if (!inWeek(U.selDay)) U.selDay = inWeek(todayKey()) ? todayKey() : keyOf(mon);
+  const range = mon.getMonth() === sun.getMonth()
+    ? `${mon.getDate()}–${sun.getDate()} de ${fmt(sun, {month: 'long'})}`
+    : `${mon.getDate()} ${fmt(mon, {month: 'short'}).replace('.', '')} – ${sun.getDate()} ${fmt(sun, {month: 'short'}).replace('.', '')}`;
+  const tk = todayKey();
+  const nav = `<section class="card glass"><div class="card-h"><button class="iconbtn glass" data-act="wk" data-d="-1" aria-label="Semana anterior">${I.chevL}</button>
+    <div class="center"><b>${range}</b><div class="small faint">${U.weekOffset === 0 ? 'Esta semana' : U.weekOffset === -1 ? 'Semana pasada' : U.weekOffset === 1 ? 'Próxima semana' : ''}${U.weekOffset !== 0 ? ` · <button class="link small" data-act="wktoday">Volver a hoy</button>` : ''}</div></div>
+    <button class="iconbtn glass" data-act="wk" data-d="1" aria-label="Semana siguiente">${I.chevR}</button></div>
+    ${weekGrid(mon, U.selDay, 'selday')}${legend()}</section>`;
+
+  const k = U.selDay, d = parseKey(k), isDD = isoDow(d) === S.profile.doseDay;
+  const dz = dosesOn(k), wk = dosesInWeek(mondayOf(d)), w = weightOn(k), m = moodOn(k);
+  let doseRow;
+  if (dz.length) doseRow = `<b>Registrada</b><span>${fTime(dz[dz.length - 1].ts)} · ${siteName(dz[dz.length - 1].site)}</span>`;
+  else if (isDD && k === tk) doseRow = `<b>Simulación prevista hoy</b><span><button class="link" data-act="toma">Iniciar toma simulada ${I.chevR}</button></span>`;
+  else if (isDD && wk.length) doseRow = `<b>Hecha otro día</b><span>${fLong(parseKey(wk[0].date))}</span>`;
+  else if (isDD && k < tk) doseRow = `<b class="warn">No registrada</b><span>Era el día previsto</span>`;
+  else if (isDD) doseRow = `<b>Prevista</b><span>Día de simulación</span>`;
+  else doseRow = `<b>—</b><span>Sin simulación prevista</span>`;
+  const future = k > tk;
+  const habitsDone = S.habits[k] || [];
+  const detail = `<section class="card glass"><div class="card-h"><h3>${fLong(d)}</h3>${k === tk ? '<span class="pill gray">Hoy</span>' : ''}</div>
+    <div class="row"><div class="ri t">${I.drop}</div><div class="rb">${doseRow}</div></div>
+    <div class="row"><div class="ri i">${I.scale}</div><div class="rb">${w ? `<b>${num(w.kg)} kg</b><span>${bmi(w.kg) ? 'IMC ' + num(bmi(w.kg)) : 'Peso registrado'}</span>` : `<b>—</b><span>${k === tk ? '<button class="link" data-act="tab" data-tab="peso">Registrar el peso de hoy</button>' : 'Sin registro de peso'}</span>`}</div></div>
+    <div class="row"><div class="ri c">${I.smile}</div><div class="rb">${m && m.mood ? `<b>${MOODS[m.mood].t}${m.symptoms && m.symptoms.length ? ' · ' + esc(m.symptoms.join(', ')) : ''}</b><span>${m.note ? '«' + esc(m.note) + '»' : 'Energía: ' + (ENERGY[m.energy] || '—') + ' · Hambre: ' + (HUNGER[m.hunger] || '—')}</span>` : `<b>—</b><span>${k === tk ? '<button class="link" data-act="tab" data-tab="estado">Anotar cómo me encuentro</button>' : 'Sin registro'}</span>`}</div></div>
+    <div class="mt"><div class="lbl">Hábitos del día</div><div class="chips">${HABITS.map(h => `<button class="chip${habitsDone.includes(h.id) ? ' on' : ''}" data-act="habit" data-k="${k}" data-h="${h.id}" ${future ? 'disabled' : ''} aria-pressed="${habitsDone.includes(h.id)}">${habitsDone.includes(h.id) ? I.check : ''}${h.t}</button>`).join('')}</div>${future ? '<p class="small faint mt-s">Podrás marcarlos ese día.</p>' : ''}</div></section>`;
+
+  const elapsed = Math.max(0, Math.min(7, daysBetween(mon, new Date()) + 1));
+  let hab = 0, wcount = 0, sym = 0;
+  for (let i = 0; i < 7; i++) { const kk = keyOf(addDays(mon, i)); hab += (S.habits[kk] || []).length; if (weightOn(kk)) wcount++; const mm = moodOn(kk); if (mm && mm.symptoms && mm.symptoms.length) sym++; }
+  const summary = `<section class="card glass"><h3 class="mb">Resumen de la semana</h3><div class="kpis">
+    <div class="kpi"><span>Toma semanal</span><b>${wk.length || dosesInWeek(mon).length ? '1/1' : '0/1'}</b><small>${dosesInWeek(mon).length ? 'Completada' : keyOf(doseDateOfWeek(mon)) < tk ? 'No registrada' : 'Pendiente'}</small></div>
+    <div class="kpi"><span>Hábitos</span><b>${hab}${elapsed ? '/' + elapsed * HABITS.length : ''}</b><small>${elapsed ? Math.round(hab / (elapsed * HABITS.length) * 100) + ' % cumplidos' : 'Semana futura'}</small></div>
+    <div class="kpi"><span>Registros de peso</span><b>${wcount}</b><small>Datos ficticios</small></div>
+    <div class="kpi"><span>Días con síntomas</span><b>${sym}</b><small>${sym ? 'En el ejemplo' : 'Sin síntomas anotados'}</small></div>
+  </div></section>`;
+  return `<div class="view">${head('Calendario', 'Semana')}${nav}${detail}${summary}</div>`;
+}
+
+function renderPeso() {
+  const ws = sortedWeights(), lw = ws[ws.length - 1], fw = ws[0], g = S.profile.goal;
+  let top = '';
+  if (lw) {
+    const d = lw.kg - fw.kg, pct = d / fw.kg * 100, b = bmi(lw.kg);
+    const prog = g && fw.kg > g ? Math.max(0, Math.min(1, (fw.kg - lw.kg) / (fw.kg - g))) : null;
+    const toGoal = g ? lw.kg - g : null;
+    top = `<section class="card glass"><div class="eyebrow">Peso actual</div><div class="bignum">${num(lw.kg)}<span>kg</span></div>
+      <p class="muted small mt-s">${fLong(parseKey(lw.date))}</p>
+      <div class="kv"><div><span>Desde el inicio</span><b class="${d < 0 ? 'good' : ''}">${sign(d)} kg</b><span>${ws.length > 1 ? sign(pct) + ' %' : '—'}</span></div>
+      <div><span>IMC</span><b>${b ? num(b) : '—'}</b><span>${b ? '' : 'Añade tu altura'}</span></div>
+      <div><span>Objetivo</span><b>${g ? num(g) : '—'}</b><span>${g ? 'kg' : 'En ajustes'}</span></div></div>
+      ${prog !== null ? `<div class="progress" role="progressbar" aria-valuenow="${Math.round(prog * 100)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${(prog * 100).toFixed(1)}%"></i></div><p class="small faint">${toGoal > 0 ? `Faltan ${num(toGoal)} kg para tu objetivo` : 'Objetivo alcanzado'} · ${Math.round(prog * 100)} % del camino</p>` : ''}</section>`;
+  }
+  const cut = U.range === '1m' ? keyOf(addDays(new Date(), -30)) : U.range === '3m' ? keyOf(addDays(new Date(), -91)) : '0000';
+  const pts = ws.filter(w => w.date >= cut);
+  const chart = `<section class="card glass"><div class="card-h"><h3>Evolución</h3></div>
+    <div class="seg mb" role="tablist">${[['1m', '1 mes'], ['3m', '3 meses'], ['todo', 'Todo']].map(([r, t]) => `<button class="${U.range === r ? 'on' : ''}" data-act="range" data-r="${r}" role="tab" aria-selected="${U.range === r}">${t}</button>`).join('')}</div>
+    <div class="chart">${weightChart(pts, {goal: g})}</div></section>`;
+  const form = `<section class="card glass"><h3 class="mb">Registrar peso</h3><div class="grid2">
+    <div><label class="lbl" for="wKg">Peso (kg)</label><input class="field" id="wKg" inputmode="decimal" autocomplete="off" placeholder="${lw ? num(lw.kg) : '95,0'}"></div>
+    <div><label class="lbl" for="wDate">Fecha</label><input class="field" id="wDate" type="date" value="${todayKey()}" max="${todayKey()}"></div></div>
+    <button class="btn primary block mt" data-act="addw">${I.plus} Guardar peso</button>
+    <p class="small faint mt-s center">Introduzca solo valores ficticios para probar la gráfica.</p></section>`;
+  const rev = [...ws].reverse().slice(0, 10);
+  const list = ws.length ? `<section class="card glass"><h3 class="mb">Registros</h3><div class="list">${rev.map((w, i) => {
+    const prev = rev[i + 1]; const df = prev ? w.kg - prev.kg : null;
+    return `<div class="li"><div class="lb"><b>${num(w.kg)} kg</b><span>${fLong(parseKey(w.date))}${df !== null ? ` · <span class="${df < 0 ? 'good' : ''}" style="display:inline">${sign(df)}</span>` : ''}</span></div><button class="del" data-act="delw" data-id="${w.id}" aria-label="Borrar registro">${I.trash}</button></div>`;
+  }).join('')}</div></section>` : '';
+  const empty = !lw ? `<section class="card glass"><div class="empty">${I.scale.replace('<svg', '<svg style="width:36px;height:36px;color:var(--indigo)"')}<p class="mt-s">Aún no hay registros ficticios.</p></div></section>` : '';
+  return `<div class="view">${head('Seguimiento', 'Peso')}${top}${empty}${lw ? chart : ''}${form}${list}</div>`;
+}
+
+function draft() {
+  const k = todayKey();
+  if (!U.draft || U.draft.date !== k) {
+    const m = moodOn(k);
+    U.draft = m ? JSON.parse(JSON.stringify(m)) : {date: k, mood: 0, energy: 0, hunger: 0, symptoms: [], note: ''};
+  }
+  return U.draft;
+}
+function renderEstado() {
+  const d = draft(), exists = !!moodOn(todayKey());
+  const scale = (key, labels, act) => `<div class="seg" role="radiogroup">${[1, 2, 3, 4, 5].map(v => `<button class="${d[key] === v ? 'on' : ''}" data-act="${act}" data-v="${v}" role="radio" aria-checked="${d[key] === v}" aria-label="${labels[v]}">${v}</button>`).join('')}</div><div class="scale-l"><span>${labels[1]}</span><b style="color:var(--text-2)">${d[key] ? labels[d[key]] : ''}</b><span>${labels[5]}</span></div>`;
+  const form = `<section class="card glass"><div class="card-h"><h3>Hoy, ${fmt(new Date(), {day: 'numeric', month: 'long'})}</h3>${exists ? `<span class="pill">${I.check} Guardado</span>` : ''}</div>
+    <div class="lbl">Ánimo</div>
+    <div class="faces">${[1, 2, 3, 4, 5].map(v => `<button class="face${d.mood === v ? ' on' : ''}" data-act="dmood" data-v="${v}" aria-pressed="${d.mood === v}">${face(v)}${MOODS[v].t}</button>`).join('')}</div>
+    <div class="lbl mt">Energía</div>${scale('energy', ENERGY, 'denergy')}
+    <div class="lbl mt">Hambre</div>${scale('hunger', HUNGER, 'dhunger')}
+    <div class="lbl mt">Síntomas</div>
+    <div class="chips">${SYMPTOMS.map(s => `<button class="chip${d.symptoms.includes(s) ? ' on' : ''}" data-act="dsym" data-s="${esc(s)}" aria-pressed="${d.symptoms.includes(s)}">${esc(s)}</button>`).join('')}<button class="chip${d.symptoms.length === 0 && d.mood ? ' on' : ''}" data-act="dsym" data-s="" aria-pressed="${d.symptoms.length === 0}">Ninguno</button></div>
+    <label class="lbl mt" for="note">Nota (opcional)</label><textarea class="field" id="note" data-input="note" maxlength="280" placeholder="Solo un ejemplo ficticio; no escriba datos reales">${esc(d.note)}</textarea>
+    <button class="btn primary block mt" data-act="savemood">${I.check} ${exists ? 'Actualizar' : 'Guardar'}</button></section>`;
+  const hist = [...S.moods].filter(m => m.mood).sort(byDate).reverse().slice(0, 6);
+  const history = `<section class="card glass"><div class="card-h"><h3>Últimos 14 días</h3></div>${moodBars(14)}
+    ${hist.length ? `<div class="list mt">${hist.map(m => `<div class="li">${face(m.mood, 34)}<div class="lb"><b>${MOODS[m.mood].t}</b><span>${fLong(parseKey(m.date))}${m.symptoms && m.symptoms.length ? ' · ' + esc(m.symptoms.join(', ')) : ''}</span>${m.note ? `<span>«${esc(m.note)}»</span>` : ''}</div></div>`).join('')}</div>` : '<div class="empty">Aún no hay registros.</div>'}</section>`;
+  return `<div class="view">${head('Bienestar', '¿Cómo me encuentro?')}${form}${history}</div>`;
+}
+
+function renderConsulta() {
+  const nv = S.profile.nextVisit;
+  const visit = `<section class="card glass"><div class="card-h"><h3>Próxima consulta</h3>${nv ? `<span class="pill indigo">${visitWhen(parseKey(nv))}</span>` : ''}</div>
+    <input class="field" type="date" id="visit" data-change="visit" value="${nv || ''}" min="${todayKey()}" aria-label="Fecha de la próxima consulta"></section>`;
+  const qs = [...S.questions].sort((a, b) => (a.done - b.done) || (a.ts - b.ts));
+  const pend = qs.filter(q => !q.done).length;
+  const have = new Set(S.questions.map(q => q.text.trim().toLowerCase()));
+  const sug = SUGGEST.filter(s => !have.has(s.toLowerCase()));
+  const questions = `<section class="card glass"><div class="card-h"><h3>Preguntas para la consulta</h3><span class="pill gray">${pend} pendiente${pend === 1 ? '' : 's'}</span></div>
+    <div class="addrow"><input class="field" id="qInput" maxlength="200" placeholder="Escriba una pregunta ficticia…" enterkeyhint="done" autocomplete="off"><button class="btn primary" data-act="addq" aria-label="Añadir pregunta">${I.plus}</button></div>
+    ${qs.length ? `<div class="mt">${qs.map(q => `<div class="q${q.done ? ' done' : ''}"><button class="qc" data-act="toggleq" data-id="${q.id}" aria-label="${q.done ? 'Marcar como pendiente' : 'Marcar como resuelta'}">${q.done ? I.check : ''}</button><div class="qt">${esc(q.text)}</div><button class="del" data-act="delq" data-id="${q.id}" aria-label="Borrar pregunta">${I.trash}</button></div>`).join('')}</div>` : '<div class="empty">Apunta aquí lo que quieras preguntar. Marca cada pregunta cuando te la respondan.</div>'}
+    ${sug.length ? `<div class="lbl mt">Sugerencias</div><div class="chips">${sug.slice(0, 5).map(s => `<button class="chip" data-act="sugq" data-s="${esc(s)}">${I.plus}${esc(s)}</button>`).join('')}</div>` : ''}
+    ${pend ? `<button class="btn soft block mt" data-act="shareq">${I.share} Copiar preguntas</button>` : ''}</section>`;
+  const pro = `<button class="card glass procard" data-act="pro"><div class="pi">${I.steth}</div><div style="flex:1"><h3>Vista del profesional</h3><p class="small muted">Resumen ficticio con peso, adherencia, síntomas y preguntas.</p></div><div class="chev">${I.chevR}</div></button>`;
+  return `<div class="view">${head('Prepárala', 'Consulta')}${pro}${visit}${questions}</div>`;
+}
+
+/* ---------- vista profesional ---------- */
+function proData() {
+  const weeks = U.proRange, now = new Date();
+  const from = weeks ? addDays(now, -weeks * 7 + 1) : parseKey(S.profile.start);
+  const fromK = keyOf(from);
+  const ws = sortedWeights(), fw = ws[0], lw = ws[ws.length - 1];
+  const inR = ws.filter(w => w.date >= fromK);
+  const base = ws.filter(w => w.date < fromK).pop() || inR[0];
+  const ad = adherence(weeks ? from : null);
+  const moods = S.moods.filter(m => m.date >= fromK && m.mood);
+  const avg = f => { const a = moods.filter(f); return a.length ? a.reduce((s, m) => s + f(m), 0) / a.length : null; };
+  const symCount = {}; let symDays = 0;
+  moods.forEach(m => { if (m.symptoms && m.symptoms.length) { symDays++; m.symptoms.forEach(s => symCount[s] = (symCount[s] || 0) + 1); } });
+  const sym = Object.entries(symCount).sort((a, b) => b[1] - a[1]);
+  const doses = S.doses.filter(d => d.date >= fromK).sort((a, b) => b.ts - a.ts);
+  const weeksSince = fw && lw ? Math.max(1, daysBetween(parseKey(fw.date), parseKey(lw.date)) / 7) : null;
+  const notes = moods.filter(m => m.note).sort(byDate).reverse().slice(0, 4);
+  return {weeks, from, fromK, fw, lw, inR, base, ad, moods, sym, symDays, doses, weeksSince, notes,
+    mood: avg(m => m.mood), energy: avg(m => m.energy), hunger: avg(m => m.hunger),
+    pend: S.questions.filter(q => !q.done)};
+}
+function renderPro() {
+  const p = proData(), P = S.profile;
+  const rangeTxt = p.weeks ? `últimas ${p.weeks} semanas` : 'todo el ejemplo';
+  const total = p.fw && p.lw ? p.lw.kg - p.fw.kg : null;
+  const period = p.base && p.lw ? p.lw.kg - p.base.kg : null;
+  const startD = parseKey(P.start), wkN = Math.floor(daysBetween(startD, new Date()) / 7) + 1;
+  const bar = (label, val, max, cls = '') => `<div class="hbar"><span>${label}</span><div class="tr"><div class="fl ${cls}" style="width:${max ? Math.max(4, val / max * 100) : 0}%"></div></div><b>${typeof val === 'number' && !Number.isInteger(val) ? num(val) : val}</b></div>`;
+  return `<div class="sheet-head"><div class="sp"></div><div class="st"><div class="eyebrow">Mi rutina · Resumen del ejemplo</div><h2>Vista del profesional</h2></div><button class="iconbtn glass no-print" data-act="closesheet" aria-label="Cerrar">${I.x}</button></div>
+  <div class="seg mb no-print">${[[4, '4 semanas'], [12, '12 semanas'], [0, 'Todo']].map(([r, t]) => `<button class="${U.proRange === r ? 'on' : ''}" data-act="prorange" data-r="${r}">${t}</button>`).join('')}</div>
+  <div class="pro-band"><span class="pill indigo">${I.info} Datos ficticios de demostración</span><span class="pill gray">${cap(rangeTxt)} · ${fShort(new Date())}</span></div>
+  <div class="sect"><h3>Caso ficticio</h3><div class="pinfo">
+    <div><span>Inicio del ejemplo</span>${fShort(startD)} ${startD.getFullYear()} · semana ${wkN}</div>
+    <div><span>Altura</span>${P.height ? P.height + ' cm' : '—'}</div>
+    <div><span>Día de toma</span>${WDN[P.doseDay - 1]}</div>
+    <div><span>Peso objetivo</span>${P.goal ? num(P.goal) + ' kg' : '—'}</div>
+    <div><span>Próxima consulta</span>${P.nextVisit ? fShort(parseKey(P.nextVisit)) : '—'}</div>
+  </div></div>
+  <div class="kpis mb">
+    <div class="kpi"><span>Peso actual</span><b>${p.lw ? num(p.lw.kg) + ' kg' : '—'}</b><small>${p.lw && bmi(p.lw.kg) ? 'IMC ' + num(bmi(p.lw.kg)) : (p.lw ? fShort(parseKey(p.lw.date)) : 'Sin datos')}</small></div>
+    <div class="kpi"><span>Cambio total</span><b class="${total < 0 ? 'good' : ''}">${total !== null ? sign(total) + ' kg' : '—'}</b><small>${total !== null ? sign(total / p.fw.kg * 100) + ' % desde ' + num(p.fw.kg) + ' kg' : ''}</small></div>
+    <div class="kpi"><span>Cambio en el periodo</span><b class="${period < 0 ? 'good' : ''}">${period !== null ? sign(period) + ' kg' : '—'}</b><small>${p.weeksSince && total !== null ? 'Ritmo medio ' + sign(total / p.weeksSince) + ' kg/sem' : ''}</small></div>
+    <div class="kpi"><span>Adherencia a la toma</span><b>${p.ad.pct !== null ? p.ad.pct + ' %' : '—'}</b><small>${p.ad.taken}/${p.ad.due} semanas registradas</small></div>
+    <div class="kpi"><span>Ánimo medio</span><b>${p.mood !== null ? num(p.mood) + '/5' : '—'}</b><small>${p.moods.length} registros</small></div>
+    <div class="kpi"><span>Días con síntomas</span><b>${p.symDays}</b><small>${p.moods.length ? Math.round(p.symDays / p.moods.length * 100) + ' % de los registros' : '—'}</small></div>
+  </div>
+  <div class="sect"><h3>Evolución del peso</h3><div class="chart">${weightChart(p.inR.length >= 2 ? p.inR : sortedWeights(), {goal: P.goal, h: 180})}</div></div>
+  <div class="sect"><h3>Síntomas referidos</h3>${p.sym.length ? p.sym.slice(0, 7).map(([s, n]) => bar(esc(s), n, p.sym[0][1])).join('') : '<p class="small faint">Sin síntomas registrados en el periodo.</p>'}</div>
+  <div class="sect"><h3>Bienestar (media 1–5)</h3>${bar('Ánimo', p.mood !== null ? +p.mood.toFixed(1) : 0, 5, 'ok')}${bar('Energía', p.energy !== null ? +p.energy.toFixed(1) : 0, 5, 'ok')}${bar('Hambre', p.hunger !== null ? +p.hunger.toFixed(1) : 0, 5, 'ok')}</div>
+  <div class="sect"><h3>Registro de tomas</h3>${p.ad.missed.length ? `<p class="small mb"><span class="pill amber">${I.info} ${p.ad.missed.length} semana${p.ad.missed.length > 1 ? 's' : ''} sin toma</span> <span class="faint">${p.ad.missed.map(d => fShort(d)).join(', ')}</span></p>` : ''}
+    ${p.doses.length ? `<table class="tbl"><thead><tr><th>Fecha</th><th>Hora</th><th>Zona</th></tr></thead><tbody>${p.doses.slice(0, 14).map(d => `<tr><td>${cap(fmt(parseKey(d.date), {weekday: 'short', day: 'numeric', month: 'short'}).replace(/\./g, ''))}</td><td>${fTime(d.ts)}</td><td>${siteName(d.site)}</td></tr>`).join('')}</tbody></table>` : '<p class="small faint">Sin tomas registradas en el periodo.</p>'}</div>
+  <div class="sect"><h3>Preguntas del ejemplo</h3>${p.pend.length ? `<ul style="margin:0;padding-left:20px">${p.pend.map(q => `<li style="margin:5px 0">${esc(q.text)}</li>`).join('')}</ul>` : '<p class="small faint">Sin preguntas pendientes.</p>'}</div>
+  ${p.notes.length ? `<div class="sect"><h3>Notas recientes</h3>${p.notes.map(m => `<p class="small" style="margin:6px 0"><b>${fShort(parseKey(m.date))}:</b> «${esc(m.note)}»</p>`).join('')}</div>` : ''}
+  <div class="btnrow no-print"><button class="btn soft" data-act="proshare">${I.share} Copiar resumen</button><button class="btn soft" data-act="proprint">${I.print} Imprimir</button></div>
+  <p class="note">Prototipo educativo con datos ficticios. No constituye una historia clínica.</p>`;
+}
+function proText() {
+  const p = proData(), P = S.profile, L = [];
+  L.push(`Mi rutina · DEMOSTRACIÓN CON DATOS FICTICIOS (${fShort(new Date())} ${new Date().getFullYear()})`);
+  L.push(`Periodo: ${p.weeks ? 'últimas ' + p.weeks + ' semanas' : 'todo el ejemplo'}`);
+  if (p.lw) L.push(`Peso actual: ${num(p.lw.kg)} kg${bmi(p.lw.kg) ? ' (IMC ' + num(bmi(p.lw.kg)) + ')' : ''}`);
+  if (p.fw && p.lw && p.fw !== p.lw) L.push(`Cambio total: ${sign(p.lw.kg - p.fw.kg)} kg (${sign((p.lw.kg - p.fw.kg) / p.fw.kg * 100)} %)`);
+  L.push(`Adherencia a la toma: ${p.ad.taken}/${p.ad.due} semanas${p.ad.pct !== null ? ' (' + p.ad.pct + ' %)' : ''}`);
+  if (p.mood !== null) L.push(`Ánimo medio: ${num(p.mood)}/5 · Días con síntomas: ${p.symDays}`);
+  if (p.sym.length) L.push(`Síntomas más frecuentes: ${p.sym.slice(0, 4).map(([s, n]) => `${s} (${n})`).join(', ')}`);
+  if (p.pend.length) { L.push('Preguntas:'); p.pend.forEach(q => L.push('• ' + q.text)); }
+  L.push('Solo datos ficticios. No usar con pacientes.');
+  return L.join('\n');
+}
+
+/* ---------- toma simulada ---------- */
+const T = {step: 1, site: 'abdomen', checks: [false, false, false], msg: '', warn: false, pending: null};
+const H = {raf: 0, t0: 0, active: false, auto: false, lastSec: 10};
+const CHECKS = [
+  {t: 'Ejemplo preparado', d: 'No se utiliza un dispositivo real'},
+  {t: 'Datos ficticios', d: 'No introduzca datos de pacientes'},
+  {t: 'Cuenta atrás', d: '10 segundos solo para la demostración'}
+];
+const RING = 2 * Math.PI * 112;
+function figure(site) {
+  const on = z => site === z ? ' on' : '';
+  return `<svg viewBox="0 0 120 230" aria-hidden="true"><g fill="var(--text-3)" opacity=".2">
+    <circle cx="60" cy="50" r="19"/><circle cx="60" cy="115" r="19"/><circle cx="60" cy="180" r="19"/></g>
+    <circle class="z${on('abdomen')}" cx="60" cy="50" r="10"/><circle class="zp${on('abdomen')}" cx="60" cy="50" r="10"/>
+    <circle class="z${on('muslo')}" cx="60" cy="115" r="10"/><circle class="zp${on('muslo')}" cx="60" cy="115" r="10"/>
+    <circle class="z${on('brazo')}" cx="60" cy="180" r="10"/><circle class="zp${on('brazo')}" cx="60" cy="180" r="10"/></svg>`;
+}
+function renderToma() {
+  const steps = `<div class="steps" aria-hidden="true">${[1, 2, 3, 4].map(i => `<i class="${i <= T.step ? 'on' : ''}"></i>`).join('')}</div>`;
+  const titles = ['', 'Elige una opción', 'Prepara el ejemplo', 'Mantén 10 segundos', 'Simulación completada'];
+  const back = T.step === 2 || T.step === 3;
+  const top = `<div class="sheet-head">${back ? `<button class="iconbtn glass" data-act="tback" aria-label="Atrás">${I.chevL}</button>` : '<div class="sp"></div>'}<div class="st"><div class="eyebrow">Toma simulada · paso ${T.step} de 4</div><h2>${titles[T.step]}</h2></div><button class="iconbtn glass" data-act="closesheet" aria-label="Cerrar">${I.x}</button></div>${steps}`;
+  const wk = dosesInWeek(mondayOf(new Date()));
+  if (T.step === 1) {
+    const sug = suggestSite();
+    return `${top}${wk.length ? `<p class="small muted center mb">Ya registraste la toma de esta semana (${fWd(parseKey(wk[0].date))}). Puedes practicar igualmente.</p>` : ''}
+      <div class="zone"><div class="fig">${figure(T.site)}</div><div class="sites">${SITE_ORDER.map(z => `<button class="site${T.site === z ? ' on' : ''}" data-act="tsite" data-z="${z}" aria-pressed="${T.site === z}">${z === sug ? '<em>Ejemplo</em>' : ''}<b>${SITES[z].t}</b><span>${SITES[z].d}</span></button>`).join('')}</div></div>
+      <p class="small faint center mt">Estas opciones son elementos gráficos ficticios.</p>
+      <button class="btn primary block mt" data-act="tnext">Continuar</button>`;
+  }
+  if (T.step === 2) {
+    const all = T.checks.every(Boolean);
+    return `${top}${CHECKS.map((c, i) => `<button class="ck${T.checks[i] ? ' on' : ''}" data-act="tcheck" data-i="${i}" aria-pressed="${T.checks[i]}"><span class="box">${I.check}</span><span><b>${c.t}</b><small>${c.d}</small></span></button>`).join('')}
+      <p class="small faint center mt-s">Opción elegida: <b style="color:var(--text)">${siteName(T.site)}</b></p>
+      <button class="btn primary block mt" data-act="tnext" ${all ? '' : 'disabled'}>${all ? 'Continuar' : 'Marca los tres pasos'}</button>`;
+  }
+  if (T.step === 3) {
+    return `${top}<p class="muted center">${H.auto ? 'Cuenta atrás en marcha…' : 'Mantén pulsado el círculo hasta que llegue a cero.'}</p>
+      <button class="hold glass" id="holdBtn" aria-label="Mantén pulsado durante 10 segundos">
+        <svg class="ring" viewBox="0 0 260 260" aria-hidden="true"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#6366f1"/></linearGradient></defs>
+        <circle cx="130" cy="130" r="112" fill="none" stroke="var(--hairline)" stroke-width="14"/>
+        <circle id="ringFill" cx="130" cy="130" r="112" fill="none" stroke="url(#rg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="${RING.toFixed(1)}" stroke-dashoffset="${RING.toFixed(1)}"/></svg>
+        <span class="inner"><span class="count" id="count">10</span><span class="hl" id="holdLbl" style="display:block">${H.auto ? 'segundos' : 'Mantén pulsado'}</span></span>
+      </button>
+      <p class="msg${T.warn ? ' warn' : ''}" id="tmsg">${esc(T.msg)}</p>
+      ${H.auto ? `<button class="btn soft block" data-act="tstop">Detener</button>` : `<button class="btn soft block" data-act="tauto">${I.hand} Hacerlo sin mantener pulsado</button>`}`;
+  }
+  const p = T.pending;
+  return `${top}<div class="okmark">${ic('<path d="m5 12.5 4.5 4.5L19 7.5" stroke-width="2.6"/>')}</div>
+    <p class="center" style="font-size:18px;font-weight:700">10 segundos completos</p>
+    <p class="muted center">${fLong(new Date(p.ts))} · ${fTime(p.ts)} · ${siteName(p.site)}</p>
+    ${wk.length ? `<p class="small warn center mt-s">Ya hay una toma registrada esta semana.</p>` : ''}
+    <div class="stack mt"><button class="btn primary block" data-act="tsave">${I.cal} ${wk.length ? 'Guardar igualmente' : 'Guardar en mi calendario'}</button>
+    <button class="btn soft block" data-act="tdiscard">Era solo práctica</button></div>
+    <p class="note">Esta cuenta atrás es solo una interacción de demostración.</p>`;
+}
+function openToma() {
+  stopHold(); H.auto = false;
+  Object.assign(T, {step: 1, site: suggestSite(), checks: [false, false, false], msg: '', warn: false, pending: null});
+  openSheet(renderToma(), 'full', {onRender: bindHold});
+}
+function refreshToma() { setSheetContent(renderToma()); bindHold(); }
+function setRing(p, reset) {
+  const f = $('#ringFill'); if (!f) return;
+  f.classList.toggle('reset', !!reset);
+  f.setAttribute('stroke-dashoffset', (RING * (1 - p)).toFixed(1));
+  const c = $('#count'); if (c) c.textContent = Math.max(0, Math.ceil(10 * (1 - p) - 1e-6));
+}
+function bindHold() {
+  const b = $('#holdBtn'); if (!b) return;
+  b.addEventListener('pointerdown', e => { if (H.auto) return; e.preventDefault(); try { b.setPointerCapture(e.pointerId); } catch (_) {} startHold(); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => b.addEventListener(ev, () => { if (!H.auto) endHold(); }));
+  b.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat && !H.auto) { e.preventDefault(); startHold(); } });
+  b.addEventListener('keyup', e => { if ((e.key === ' ' || e.key === 'Enter') && !H.auto) { e.preventDefault(); endHold(); } });
+  b.addEventListener('contextmenu', e => e.preventDefault());
+}
+function startHold() {
+  if (H.active) return;
+  H.active = true; H.t0 = performance.now(); H.lastSec = 10;
+  T.msg = ''; T.warn = false;
+  const m = $('#tmsg'); if (m) { m.textContent = H.auto ? '' : 'Sigue pulsando…'; m.className = 'msg'; }
+  const lb = $('#holdLbl'); if (lb) lb.textContent = 'segundos';
+  $('#holdBtn') && $('#holdBtn').classList.add('active');
+  vib(30); tick();
+}
+function tick() {
+  const el = performance.now() - H.t0, p = Math.min(1, el / 10000);
+  setRing(p);
+  const sec = Math.ceil(10 - el / 1000);
+  if (sec !== H.lastSec) { H.lastSec = sec; vib(12); }
+  if (p >= 1) { finishHold(); return; }
+  H.raf = requestAnimationFrame(tick);
+}
+function endHold() {
+  if (!H.active) return;
+  cancelAnimationFrame(H.raf); H.active = false;
+  const el = performance.now() - H.t0;
+  $('#holdBtn') && $('#holdBtn').classList.remove('active');
+  if (el < 10000) {
+    const s = Math.floor(el / 1000);
+    T.msg = s < 1 ? 'Mantén pulsado el círculo durante 10 segundos.' : `Has soltado a los ${s} s. Vuelve a intentarlo para completar la simulación.`;
+    T.warn = s >= 1;
+    const m = $('#tmsg'); if (m) { m.textContent = T.msg; m.className = 'msg' + (T.warn ? ' warn' : ''); }
+    const lb = $('#holdLbl'); if (lb) lb.textContent = 'Mantén pulsado';
+    setRing(0, true); vib([40, 60, 40]);
+  }
+}
+function finishHold() {
+  H.active = false; H.auto = false; cancelAnimationFrame(H.raf);
+  vib([70, 50, 70]);
+  const now = new Date();
+  T.pending = {id: uid(), date: keyOf(now), ts: now.getTime(), site: T.site};
+  T.step = 4; refreshToma();
+}
+function stopHold() { cancelAnimationFrame(H.raf); H.active = false; }
+
+/* ---------- hojas, diálogos, avisos ---------- */
+let closeTimer = 0, sheetOpts = {};
+function setSheetContent(html) { $('#sheet .content').innerHTML = html ? DEMO_NOTICE + html : ''; }
+function openSheet(html, cls = '', opts = {}) {
+  clearTimeout(closeTimer);
+  const sh = $('#sheet'); sheetOpts = opts;
+  sh.className = 'sheet open ' + cls;
+  setSheetContent(html);
+  $('#sheet .panel').scrollTop = 0;
+  document.body.classList.add('locked');
+  if (opts.onRender) opts.onRender();
+}
+function closeSheet() {
+  stopHold(); H.auto = false;
+  const sh = $('#sheet'); if (!sh.classList.contains('open')) return;
+  sh.classList.add('closing');
+  closeTimer = setTimeout(() => { sh.className = 'sheet'; setSheetContent(''); document.body.classList.remove('locked'); sheetOpts = {}; }, 220);
+}
+function confirmBox({title, text, ok = 'Aceptar', danger = false}) {
+  return new Promise(res => {
+    const d = $('#dialog');
+    d.innerHTML = `<div class="box glass"><h3>${title}</h3><p>${text}</p><div class="btnrow" style="margin-top:0"><button class="btn soft" data-r="0">Cancelar</button><button class="btn ${danger ? 'danger' : 'primary'}" data-r="1">${ok}</button></div></div>`;
+    d.classList.add('open');
+    d.onclick = e => {
+      const b = e.target.closest('[data-r]');
+      if (!b && e.target !== d) return;
+      d.classList.remove('open'); d.onclick = null; res(!!b && b.dataset.r === '1');
+    };
+    setTimeout(() => { const b = d.querySelector('[data-r="0"]'); b && b.focus(); }, 30);
+  });
+}
+let toastT = 0;
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2200); }
+async function shareText(title, text) {
+  try { await navigator.clipboard.writeText(text); toast('Copiado al portapapeles'); return; } catch (_) {}
+  openSheet(`<div class="sheet-head"><div class="sp"></div><div class="st"><h2>Copiar texto</h2></div><button class="iconbtn glass" data-act="closesheet" aria-label="Cerrar">${I.x}</button></div><textarea class="field" style="min-height:260px" readonly>${esc(text)}</textarea>`);
+}
+
+/* ---------- ajustes y bienvenida ---------- */
+function renderSettings() {
+  const P = S.profile;
+  const swOk = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+  return `<div class="sheet-head"><div class="sp"></div><div class="st"><div class="eyebrow">Mi rutina</div><h2>Ajustes</h2></div><button class="iconbtn glass" data-act="closesheet" aria-label="Cerrar">${I.x}</button></div>
+  <div class="sect"><h3>Perfil ficticio</h3>
+    <div class="grid2 mt"><div><label class="lbl" for="sH">Altura (cm)</label><input class="field" id="sH" inputmode="numeric" value="${P.height || ''}" placeholder="168"></div>
+    <div><label class="lbl" for="sG">Peso objetivo (kg)</label><input class="field" id="sG" inputmode="decimal" value="${P.goal ? num(P.goal) : ''}" placeholder="85,0"></div></div>
+    <div class="grid2 mt"><div><label class="lbl" for="sD">Día de la toma</label><select class="field" id="sD">${WDN.map((w, i) => `<option value="${i + 1}" ${P.doseDay === i + 1 ? 'selected' : ''}>${w}</option>`).join('')}</select></div>
+    <div><label class="lbl" for="sS">Inicio</label><input class="field" id="sS" type="date" value="${P.start}" max="${todayKey()}"></div></div>
+    <button class="btn primary block mt" data-act="savesettings">${I.check} Guardar</button></div>
+  <div class="sect"><h3>Datos</h3><div class="stack">
+    <button class="btn soft block" data-act="demo">${I.sparkle} Cargar datos de ejemplo</button>
+    <button class="btn soft block" data-act="export">${I.download} Exportar copia (JSON)</button>
+    <button class="btn dsoft block" data-act="reset">${I.reset} Reiniciar datos</button></div>
+    <p class="small faint mt-s">Reiniciar borra los ejemplos de esta sesión.</p></div>
+  <div class="sect"><h3>Sin conexión</h3><div class="row"><div class="ri ${swOk ? 't' : 'a'}">${swOk ? I.cloud : I.info}</div><div class="rb"><b>${swOk ? 'Lista para usar sin conexión' : 'Preparando el modo sin conexión'}</b><span>${swOk ? 'La aplicación puede abrirse sin conexión tras la primera carga.' : 'Se activa tras la primera carga con conexión.'}</span></div></div>
+    <p class="small faint mt-s">En iPhone: Compartir → «Añadir a pantalla de inicio» para abrirla como una app.</p></div>
+  <p class="note">Mi rutina ${VERSION} · Prototipo educativo. Los datos de ejemplo se borran al recargar o cerrar la página.</p>`;
+}
+function openSettings() { openSheet(renderSettings(), 'full'); }
+function showWelcome() {
+  openSheet(`<div class="welcome"><div class="appicon">${LOGO}</div><h2>Mi rutina</h2><p class="muted mt-s">Una demostración interactiva con datos ficticios.</p>
+    <ul class="feat">
+      <li>${I.drop}<div><b>Simulación interactiva</b><span>Simulación paso a paso de 10 segundos</span></div></li>
+      <li>${I.cal}<div><b>Calendario semanal</b><span>Tomas, hábitos y registros de un vistazo</span></div></li>
+      <li>${I.scale}<div><b>Peso y bienestar</b><span>Gráfica de evolución y cómo te encuentras</span></div></li>
+      <li>${I.steth}<div><b>Consulta preparada</b><span>Preguntas y resumen de un caso ficticio</span></div></li>
+    </ul>
+    <div class="stack"><button class="btn primary block" data-act="wdemo">${I.sparkle} Explorar con datos de ejemplo</button><button class="btn soft block" data-act="wfresh">Empezar de cero</button></div>
+    <p class="note">No introduzca datos reales. Los ejemplos se borran al recargar o cerrar la página.</p></div>`, 'welcome', {lock: true});
+}
+
+/* ---------- datos de ejemplo ---------- */
+function demoData() {
+  const s = fresh(); let seed = 20261103;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const today = new Date(), tk = todayKey(), dd = isoDow(today);
+  const start = addDays(mondayOf(today), -77 + (dd - 1));
+  s.onboarded = true;
+  s.profile = {height: 166, goal: 88, doseDay: dd, start: keyOf(start), nextVisit: keyOf(addDays(today, 9))};
+  for (let w = 0; w < 11; w++) {
+    if (w === 6) continue;
+    const off = w === 3 ? (dd === 7 ? -1 : 1) : 0;
+    const d = addDays(start, w * 7 + off);
+    const ts = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 9 + Math.floor(rnd() * 3), Math.floor(rnd() * 60)).getTime();
+    s.doses.push({id: uid() + w, date: keyOf(d), ts, site: SITE_ORDER[w % 3]});
+  }
+  const total = daysBetween(start, today);
+  for (let t = 0, i = 0; t < total; t += (i++ % 2 ? 4 : 3)) {
+    const kg = 103.8 - 7.4 * (1 - Math.exp(-t / 70)) + (rnd() - 0.5) * 0.7;
+    s.weights.push({id: uid() + 'w' + t, date: keyOf(addDays(start, t)), kg: Math.round(kg * 10) / 10, ts: t});
+  }
+  const notes = {3: 'Náuseas leves por la mañana, mejor por la tarde', 12: 'Me cuesta beber suficiente agua', 26: 'He caminado casi todos los días', 44: 'Semana sin toma: estuve de viaje y se me olvidó', 61: 'Me noto con más energía y como menos picoteo'};
+  for (let t = 0; t < total; t++) {
+    if (rnd() < 0.18 && !notes[t]) continue;
+    const d = addDays(start, t), k = keyOf(d);
+    const sinceDose = (t % 7);
+    const early = t < 24;
+    const sym = [];
+    if ((early && sinceDose <= 2 && rnd() < 0.75) || (!early && sinceDose <= 1 && rnd() < 0.25)) sym.push('Náuseas');
+    if (rnd() < (early ? 0.22 : 0.08)) sym.push('Estreñimiento');
+    if (rnd() < (early ? 0.2 : 0.07)) sym.push('Cansancio');
+    if (rnd() < 0.05) sym.push('Ardor o reflujo');
+    let mood = Math.round(3 + t / total * 1.1 + (rnd() - 0.5) * 1.6 - (sym.length ? 0.7 : 0));
+    mood = Math.max(1, Math.min(5, mood));
+    s.moods.push({id: uid() + 'm' + t, date: k, mood, energy: Math.max(1, Math.min(5, mood + Math.round(rnd() - 0.5))), hunger: Math.max(1, Math.min(5, Math.round(early ? 2 + rnd() : 2.4 + rnd() * 1.4))), symptoms: sym, note: notes[t] || '', ts: d.getTime()});
+    const hb = []; const pr = 0.4 + t / total * 0.35;
+    HABITS.forEach(h => { if (rnd() < pr) hb.push(h.id); });
+    s.habits[k] = hb;
+  }
+  s.habits[tk] = ['agua'];
+  const q = (text, done, n) => ({id: uid() + n, text, done, ts: Date.now() - (10 - n) * 86400000});
+  s.questions = [q('¿Qué muestra la evolución de este ejemplo?', false, 1), q('¿Qué información se revisaría en la consulta ficticia?', false, 2), q('¿Cómo se puede visualizar el bienestar?', false, 3), q('¿Qué preguntas faltan en el resumen?', true, 4)];
+  return s;
+}
+
+/* ---------- navegación y render ---------- */
+function render() {
+  const views = {hoy: renderHoy, semana: renderSemana, peso: renderPeso, estado: renderEstado, consulta: renderConsulta};
+  $('#app').innerHTML = DEMO_NOTICE + (views[U.tab] || renderHoy)();
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-current', t.dataset.tab === U.tab ? 'page' : 'false'));
+}
+function go(tab) { U.tab = tab; render(); window.scrollTo({top: 0, behavior: 'instant'}); }
+
+/* ---------- acciones ---------- */
+const A = {
+  tab: el => { if (U.tab === el.dataset.tab) { window.scrollTo({top: 0, behavior: 'smooth'}); return; } go(el.dataset.tab); },
+  settings: openSettings,
+  pro: () => { U.proRange = 4; openSheet(renderPro(), 'full'); },
+  toma: openToma,
+  scrim: () => { if (!sheetOpts.lock) closeSheet(); },
+  closesheet: closeSheet,
+  qmood: el => {
+    const v = +el.dataset.v, k = todayKey(); let m = moodOn(k);
+    if (m) m.mood = v; else S.moods.push({id: uid(), date: k, mood: v, energy: 0, hunger: 0, symptoms: [], note: '', ts: Date.now()});
+    U.draft = null; save(); vib(10); render(); toast(`Anotado: ${MOODS[v].t.toLowerCase()}`);
+  },
+  gosemana: el => { U.weekOffset = 0; U.selDay = el.dataset.k; go('semana'); },
+  selday: el => { U.selDay = el.dataset.k; render(); },
+  wk: el => { U.weekOffset += +el.dataset.d; U.selDay = U.weekOffset === 0 ? todayKey() : keyOf(addDays(mondayOf(new Date()), U.weekOffset * 7)); render(); },
+  wktoday: () => { U.weekOffset = 0; U.selDay = todayKey(); render(); },
+  habit: el => {
+    const k = el.dataset.k, h = el.dataset.h, arr = S.habits[k] || (S.habits[k] = []);
+    const i = arr.indexOf(h); if (i >= 0) arr.splice(i, 1); else { arr.push(h); vib(10); }
+    save(); render();
+  },
+  range: el => { U.range = el.dataset.r; render(); },
+  addw: () => {
+    const raw = ($('#wKg').value || '').replace(',', '.').trim(), kg = parseFloat(raw);
+    const date = $('#wDate').value || todayKey();
+    if (!raw || isNaN(kg) || kg < 30 || kg > 350) { toast('Introduce un peso entre 30 y 350 kg'); $('#wKg').focus(); return; }
+    if (date > todayKey()) { toast('La fecha no puede ser futura'); return; }
+    const ex = weightOn(date);
+    if (ex) { ex.kg = Math.round(kg * 10) / 10; ex.ts = Date.now(); }
+    else S.weights.push({id: uid(), date, kg: Math.round(kg * 10) / 10, ts: Date.now()});
+    save(); vib(15); render(); toast(ex ? 'Peso actualizado' : 'Peso guardado');
+  },
+  delw: async el => {
+    if (!await confirmBox({title: '¿Borrar este registro?', text: 'Se eliminará de la gráfica y del resumen.', ok: 'Borrar', danger: true})) return;
+    S.weights = S.weights.filter(w => w.id !== el.dataset.id); save(); render(); toast('Registro borrado');
+  },
+  dmood: el => { draft().mood = +el.dataset.v; vib(8); render(); },
+  denergy: el => { draft().energy = +el.dataset.v; render(); },
+  dhunger: el => { draft().hunger = +el.dataset.v; render(); },
+  dsym: el => {
+    const d = draft(), s = el.dataset.s;
+    if (!s) d.symptoms = [];
+    else { const i = d.symptoms.indexOf(s); if (i >= 0) d.symptoms.splice(i, 1); else d.symptoms.push(s); }
+    render();
+  },
+  savemood: () => {
+    const d = draft(); const n = $('#note'); if (n) d.note = n.value.trim();
+    if (!d.mood) { toast('Elige primero tu ánimo'); return; }
+    const i = S.moods.findIndex(m => m.date === d.date);
+    const rec = {...d, id: i >= 0 ? S.moods[i].id : uid(), ts: Date.now()};
+    if (i >= 0) S.moods[i] = rec; else S.moods.push(rec);
+    U.draft = null; save(); vib(15); render(); toast('Guardado');
+  },
+  addq: () => {
+    const inp = $('#qInput'), t = (inp.value || '').trim();
+    if (!t) { inp.focus(); return; }
+    S.questions.push({id: uid(), text: t, done: false, ts: Date.now()}); save(); render(); toast('Pregunta añadida');
+  },
+  sugq: el => { S.questions.push({id: uid(), text: el.dataset.s, done: false, ts: Date.now()}); save(); render(); },
+  toggleq: el => { const q = S.questions.find(x => x.id === el.dataset.id); if (q) { q.done = !q.done; vib(10); save(); render(); } },
+  delq: el => { S.questions = S.questions.filter(x => x.id !== el.dataset.id); save(); render(); },
+  shareq: () => {
+    const p = S.questions.filter(q => !q.done);
+    const nv = S.profile.nextVisit ? ` (${fLong(parseKey(S.profile.nextVisit))})` : '';
+    shareText('Preguntas para la consulta', `DEMOSTRACIÓN CON DATOS FICTICIOS · Preguntas${nv}:\n` + p.map(q => '• ' + q.text).join('\n'));
+  },
+  prorange: el => { U.proRange = +el.dataset.r; setSheetContent(renderPro()); },
+  proshare: () => shareText('Resumen para consulta', proText()),
+  proprint: () => window.print(),
+  // toma
+  tsite: el => { T.site = el.dataset.z; vib(8); refreshToma(); },
+  tcheck: el => { const i = +el.dataset.i; T.checks[i] = !T.checks[i]; vib(8); refreshToma(); },
+  tnext: () => { if (T.step === 2 && !T.checks.every(Boolean)) return; T.step++; T.msg = ''; T.warn = false; refreshToma(); },
+  tback: () => { stopHold(); H.auto = false; T.step = Math.max(1, T.step - 1); refreshToma(); },
+  tauto: () => { H.auto = true; refreshToma(); startHold(); },
+  tstop: () => { endHold(); H.auto = false; const keep = {msg: T.msg, warn: T.warn}; refreshToma(); Object.assign(T, keep); const m = $('#tmsg'); if (m) { m.textContent = T.msg; m.className = 'msg' + (T.warn ? ' warn' : ''); } },
+  tsave: () => { if (T.pending) { S.doses.push(T.pending); save(); } closeSheet(); render(); toast('Simulación guardada en el calendario ficticio'); },
+  tdiscard: () => { closeSheet(); toast('Práctica completada'); },
+  // ajustes
+  savesettings: () => {
+    const P = S.profile;
+    const h = parseInt($('#sH').value, 10); P.height = h >= 100 && h <= 230 ? h : null;
+    const g = parseFloat(($('#sG').value || '').replace(',', '.')); P.goal = g >= 30 && g <= 350 ? Math.round(g * 10) / 10 : null;
+    P.doseDay = +$('#sD').value || P.doseDay;
+    const st = $('#sS').value; if (st && st <= todayKey()) P.start = st;
+    S.onboarded = true; save(); closeSheet(); render(); toast('Ajustes guardados');
+  },
+  demo: async () => {
+    if (!await confirmBox({title: '¿Cargar datos de ejemplo?', text: 'Sustituirán los datos ficticios de esta sesión.', ok: 'Cargar'})) return;
+    S = demoData(); U.draft = null; U.weekOffset = 0; U.selDay = todayKey(); save(); closeSheet(); render(); toast('Datos de ejemplo cargados');
+  },
+  export: () => {
+    try {
+      const blob = new Blob([JSON.stringify(S, null, 2)], {type: 'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `mi-rutina-${todayKey()}.json`;
+      document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    } catch (_) { toast('No se pudo exportar'); }
+  },
+  reset: async () => {
+    if (!await confirmBox({title: '¿Reiniciar todos los datos?', text: 'Se borrarán los ejemplos de esta sesión. No se puede deshacer.', ok: 'Reiniciar', danger: true})) return;
+    S = fresh(); Object.assign(U, {tab: 'hoy', weekOffset: 0, selDay: todayKey(), range: '3m', proRange: 4, draft: null});
+    render(); window.scrollTo(0, 0); showWelcome(); toast('Datos reiniciados');
+  },
+  wdemo: () => { S = demoData(); save(); closeSheet(); render(); toast('Datos de ejemplo cargados'); },
+  wfresh: () => { S = fresh(); S.onboarded = true; save(); render(); openSettings(); }
+};
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  const f = A[el.dataset.act]; if (f) f(el, e);
+});
+document.addEventListener('change', e => {
+  if (e.target.dataset.change === 'visit') { S.profile.nextVisit = e.target.value || null; save(); render(); toast(e.target.value ? 'Fecha guardada' : 'Fecha eliminada'); }
+});
+document.addEventListener('input', e => { if (e.target.dataset.input === 'note') draft().note = e.target.value; });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.id === 'qInput') { e.preventDefault(); A.addq(); }
+  if (e.key === 'Enter' && e.target.id === 'wKg') { e.preventDefault(); A.addw(); }
+  if (e.key === 'Escape') { if ($('#dialog').classList.contains('open')) $('#dialog').click(); else if (!sheetOpts.lock) closeSheet(); }
+});
+let lastDay = todayKey();
+const refreshIfNewDay = () => { if (todayKey() !== lastDay) { lastDay = todayKey(); U.selDay = lastDay; U.draft = null; render(); } };
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshIfNewDay(); });
+window.addEventListener('online', () => { if (U.tab === 'hoy') render(); });
+window.addEventListener('offline', () => { if (U.tab === 'hoy') render(); toast('Sin conexión · la app sigue funcionando'); });
+
+render();
+if (!S.onboarded) showWelcome();
+
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+}
+})();
+</script>
+</body>
+</html>
